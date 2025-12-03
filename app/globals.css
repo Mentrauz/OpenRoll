@@ -1,0 +1,711 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: #ffffff; /* Soft app background across all pages */
+  color: #111827;
+  letter-spacing: -0.015em;
+}
+
+/* Tempo Design System Typography */
+.tempo-heading-1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.tempo-heading-2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.tempo-heading-3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+}
+
+.tempo-body {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.tempo-small {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Tempo Card Styles */
+.tempo-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-tempo;
+  transition: all 0.2s ease-in-out;
+}
+
+.tempo-card:hover {
+  @apply shadow-tempo-md;
+}
+
+/* Tempo Button Styles */
+.tempo-btn-primary {
+  @apply px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 rounded-lg transition-colors;
+}
+
+.tempo-btn-secondary {
+  @apply px-4 py-2 text-sm font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors;
+}
+
+/* Tempo Badge Styles */
+.tempo-badge-success {
+  @apply px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-600;
+}
+
+.tempo-badge-danger {
+  @apply px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-600;
+}
+
+.tempo-badge-warning {
+  @apply px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-600;
+}
+
+.tempo-badge-info {
+  @apply px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-600;
+}
+
+/* Custom styles for Slick carousel */
+.custom-dots {
+  position: absolute;
+  bottom: 0;
+  display: flex !important;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  text-align: center;
+}
+
+.custom-dots li {
+  margin: 0;
+}
+
+.custom-dots li button {
+  width: 4px !important;
+  height: 4px !important;
+  padding: 0;
+}
+
+.custom-dots li button:before {
+  content: '' !important;
+  width: 4px !important;
+  height: 4px !important;
+  background-color: #000000;
+  border-radius: 50%;
+  opacity: 0.2;
+  position: static;
+}
+
+.custom-dots li.slick-active button:before {
+  opacity: 1;
+  background-color: #000000;
+}
+
+
+/* Slider container */
+.slick-slider {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Modern conditional scrollbar - only shows when content overflows */
+.custom-scrollbar,
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:active,
+::-webkit-scrollbar-thumb:active {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Corner where scrollbars meet */
+.custom-scrollbar::-webkit-scrollbar-corner,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Responsive scrollbar sizing */
+@media (max-width: 768px) {
+  .custom-scrollbar::-webkit-scrollbar,
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb {
+    border-width: 1px;
+  }
+}
+
+/* Dark mode scrollbar colors */
+@media (prefers-color-scheme: dark) {
+  .custom-scrollbar,
+  * {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active,
+  ::-webkit-scrollbar-thumb:active {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+} 
+
+/* Base font setup */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display-regular.woff2') format('woff2');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display-medium.woff2') format('woff2');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display-semibold.woff2') format('woff2');
+  font-weight: 600;
+}
+
+/* Dashboard title */
+.dashboard-title {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1d1d1f;
+  margin-bottom: 24px;
+}
+
+/* Stats */
+.stat-number {
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: #1d1d1f;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #6e6e73;
+}
+
+/* Section headers */
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1d1d1f;
+  margin-bottom: 16px;
+}
+
+/* Weather */
+.weather-temp {
+  font-size: 44px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: #1d1d1f;
+}
+
+.weather-condition {
+  font-size: 15px;
+  font-weight: 400;
+  color: #6e6e73;
+  letter-spacing: -0.015em;
+}
+
+/* Sidebar navigation */
+.nav-item {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #1d1d1f;
+  padding: 8px 0;
+}
+
+.nav-item.active {
+  font-weight: 500;
+  color: #000000;
+}
+
+/* Calendar */
+.calendar-header {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: #1d1d1f;
+}
+
+.calendar-day {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: #1d1d1f;
+}
+
+.calendar-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: #6e6e73;
+}
+
+/* Hide static route indicator */
+#__next-build-watcher {
+  display: none;
+}
+
+/* Hide Next.js development indicators */
+[data-nextjs-dialog-overlay],
+[data-nextjs-dialog],
+[data-nextjs-toast],
+.nextjs-build-watcher {
+  display: none !important;
+}
+
+/* Remove arrows from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Add beautiful focus styles */
+*:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 1px;
+}
+
+/* Apple-style Select Dropdowns */
+select.appearance-none {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Dark mode select arrow */
+.dark select.appearance-none {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Modern Date Picker Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.2s ease-out, slideInFromTop 0.2s ease-out;
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.slide-in-from-top-2 {
+  animation: slideInFromTop 0.2s ease-out;
+}
+
+.duration-200 {
+  animation-duration: 0.2s;
+}
+
+/* Enhanced Loading Spinner Animations */
+@keyframes shimmer {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin,
+  .animate-spin-slow,
+  .animate-spin-fast,
+  .animate-bounce,
+  .animate-bounce-staggered,
+  .animate-pulse,
+  .animate-pulse-glow,
+  .shimmer,
+  .glow-pulse {
+    animation: none !important;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced backdrop blur support */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Loading spinner specific enhancements */
+.loading-spinner-container {
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+/* Ultra-smooth theme transitions with optimized performance */
+
+/* Theme transition custom properties */
+:root {
+  --theme-transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --theme-transition-normal: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --theme-transition-slow: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --theme-transition-bounce: 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Force smooth theme transitions - override Tailwind conflicts */
+*,
+*::before,
+*::after {
+  transition-property: background-color, color, border-color, fill, stroke, box-shadow, opacity;
+  transition-duration: 200ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: background-color, color, border-color, fill, stroke;
+}
+
+/* Specialized timing for different element types */
+
+/* Base layer - foundation elements */
+html {
+  transition-duration: 300ms !important;
+}
+
+body {
+  transition-duration: 280ms !important;
+}
+
+/* Specialized timing for different element types */
+
+/* Base layer - foundation elements */
+html {
+  transition-duration: 300ms !important;
+}
+
+body {
+  transition-duration: 280ms !important;
+}
+
+/* Structural containers - medium timing */
+main,
+section,
+article,
+aside,
+footer,
+nav,
+header {
+  transition-duration: 240ms !important;
+}
+
+/* Content elements - balanced timing */
+div,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+label,
+ul,
+ol,
+li,
+table,
+thead,
+tbody,
+tr,
+th,
+td {
+  transition-duration: 200ms !important;
+}
+
+/* Interactive elements - responsive timing */
+button,
+input,
+textarea,
+select,
+a,
+form {
+  transition-duration: 160ms !important;
+}
+
+/* Icon elements - fastest timing */
+svg,
+path,
+circle,
+rect,
+line,
+polyline,
+polygon {
+  transition-duration: 120ms !important;
+}
+
+/* Specialized hover and interaction states */
+button:hover,
+input:hover,
+textarea:hover,
+select:hover,
+a:hover {
+  transition-duration: 80ms !important;
+}
+
+/* Enhanced theme toggle button with smooth interactions */
+button[aria-label="Toggle theme"] {
+  transition-duration: 140ms !important;
+  transition-property: background-color, transform, box-shadow !important;
+}
+
+button[aria-label="Toggle theme"]:hover {
+  transform: scale(1.03);
+}
+
+button[aria-label="Toggle theme"]:active {
+  transform: scale(0.97);
+  transition-duration: 60ms !important;
+}
+
+/* Smooth focus transitions */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  transition-duration: 120ms !important;
+  transition-property: box-shadow, border-color !important;
+}
+
+/* Optimized sidebar transitions */
+aside {
+  transition-duration: 220ms !important;
+  transition-property: background-color, border-color, box-shadow !important;
+}
+
+/* Header smooth transitions */
+header {
+  transition-duration: 200ms !important;
+  transition-property: background-color, border-color, box-shadow !important;
+}
+
+/* Table interactions */
+tr:hover {
+  transition-duration: 100ms !important;
+}
+
+/* Enhanced visual feedback for theme toggle */
+.theme-toggle-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  pointer-events: none;
+}
+
+.theme-toggle-wrapper:hover::before {
+  opacity: 1;
+}
+
+/* Performance and smoothness optimizations */
+.theme-transition-optimized {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* GPU acceleration for smooth transforms */
+button[aria-label="Toggle theme"],
+.theme-toggle-wrapper,
+[class*="avatar"],
+.w-8.h-8,
+.w-10.h-10 {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Respect user's motion preferences - disable all transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    transform: none !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  /* Keep essential layout transitions minimal */
+  html,
+  body {
+    transition: background-color 0.01ms !important;
+  }
+
+  /* Disable transform effects for accessibility */
+  button[aria-label="Toggle theme"]:hover,
+  button[aria-label="Toggle theme"]:active {
+    transform: none !important;
+  }
+}
+
+/* Attendance chart pulse animations */
+@keyframes pulse-wave {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+    stroke-width: 2;
+  }
+  50% {
+    opacity: 0.4;
+    stroke-width: 1.5;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+    stroke-width: 0.5;
+  }
+}
+
+@keyframes pulse-color {
+  0%, 100% {
+    fill: #3B82F6;
+  }
+  50% {
+    fill: #60A5FA;
+  }
+}

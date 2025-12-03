@@ -1,0 +1,184 @@
+/* Custom date picker styling - Fallback for any remaining native date inputs */
+input[type="date"] {
+  position: relative;
+  color: #374151;
+  font-family: inherit;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: transparent;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  position: absolute;
+  right: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'%3E%3C/path%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  transition: background-color 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  padding: 0;
+  color: #374151;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #374151;
+  padding: 0 0.2em;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #374151;
+}
+
+input[type="date"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+input[type="date"]::-webkit-clear-button {
+  display: none;
+}
+
+/* Calendar popup styling - Modern light theme */
+::-webkit-calendar-picker {
+  background-color: white !important;
+  border-radius: 12px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  padding: 12px !important;
+  color: #374151 !important;
+}
+
+/* Header styling */
+::-webkit-calendar-picker-header {
+  background-color: white !important;
+  color: #374151 !important;
+  padding: 8px !important;
+}
+
+/* Navigation buttons */
+::-webkit-calendar-picker-nav {
+  background-color: white !important;
+  color: #000000 !important;
+}
+
+/* Month and year select */
+::-webkit-calendar-picker-month-year {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+/* Weekday headers */
+::-webkit-calendar-picker-weekday {
+  color: #6B7280 !important;
+  font-weight: 500 !important;
+}
+
+/* Calendar days */
+::-webkit-calendar-picker-day {
+  color: #374151 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s !important;
+}
+
+/* Today's date */
+::-webkit-calendar-picker-day-today {
+  background-color: #F5F5F5 !important;
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Selected date */
+::-webkit-calendar-picker-day-selected {
+  background-color: #000000 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+/* Hover state for days */
+::-webkit-calendar-picker-day:hover {
+  background-color: #F5F5F5 !important;
+  color: #000000 !important;
+}
+
+/* Footer buttons */
+::-webkit-calendar-picker-footer button {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+::-webkit-calendar-picker-footer button:hover {
+  background-color: #F5F5F5 !important;
+}
+
+/* Navigation arrows */
+::-webkit-calendar-picker-nav button {
+  color: #000000 !important;
+}
+
+::-webkit-calendar-picker-nav button:hover {
+  background-color: #F5F5F5 !important;
+  border-radius: 4px !important;
+}
+
+/* Month/Year dropdown */
+::-webkit-calendar-picker select {
+  color: #374151 !important;
+  font-weight: 500 !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+::-webkit-calendar-picker select:hover {
+  border-color: #000000 !important;
+}
+
+/* Disabled dates */
+::-webkit-calendar-picker-day-disabled {
+  color: #D1D5DB !important;
+}
+
+/* Week numbers if shown */
+::-webkit-calendar-picker-week-number {
+  color: #6B7280 !important;
+  font-size: 0.875rem !important;
+}
+
+/* Grid styling */
+::-webkit-calendar-picker-grid {
+  border-spacing: 2px !important;
+}
+
+/* Additional hover states */
+::-webkit-calendar-picker button:hover {
+  background-color: #F5F5F5 !important;
+  color: #000000 !important;
+}
+
+/* Today button */
+::-webkit-calendar-picker-footer-today {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Clear button */
+::-webkit-calendar-picker-footer-clear {
+  color: #000000 !important;
+  font-weight: 500 !important;
+} 
