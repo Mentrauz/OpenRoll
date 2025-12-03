@@ -68,10 +68,10 @@ A comprehensive payroll management solution built with Next.js, designed to stre
 3. **Environment Configuration**
    Create a `.env.local` file in the root directory:
    ```env
-   MONGODB_URI=mongodb://localhost:27017/payroll
+   MONGODB_URI=mongodb://localhost:27017/payroll (For local hosting of database)
    NEXTAUTH_SECRET=your-secret-key
    NEXTAUTH_URL=http://localhost:3001
-   SUREPASS_API_KEY=your-api-key
+   SUREPASS_API_KEY=your-api-key (For bank and aadhar verification)
    ```
 
 4. **Database Setup**
