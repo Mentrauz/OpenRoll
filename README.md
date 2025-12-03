@@ -107,7 +107,7 @@ payroll-uid/
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run reset-passwords-interactive` - Interactive password reset
+<!-- - `npm run reset-passwords-interactive` - Interactive password reset --> Not Required!
 
 ## 🔐 Authentication & Security
 
