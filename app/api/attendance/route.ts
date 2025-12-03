@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     }
 
     const { db } = await connectToDatabase();
-    
+
     // Query the attendance collection for monthly summary
     const attendance = await db.collection('attendance').findOne({
       year: year,
@@ -36,22 +36,22 @@ export async function GET(request: Request) {
     });
 
     if (!attendance) {
-    return NextResponse.json({
-      success: true,
-      attendance: {
-        presentDays: 0
-      }
-    }, {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      }
-    });
+      return NextResponse.json({
+        success: true,
+        attendance: {
+          presentDays: 0
+        }
+      }, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        }
+      });
     }
 
     const monthlyDays = new Date(parseInt(year), parseInt(month), 0).getDate();
-    
+
     // Extract and validate the employee's record
     const monthData = attendance.months.find(m => m.month === month);
     const unitData = monthData.units.find(u => u.unit === 'YOUR COMPANY NAME');
@@ -107,12 +107,12 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { tmsId, location } = body;
+    const { id, location } = body;
 
-    if (!tmsId) {
+    if (!id) {
       return NextResponse.json({
         success: false,
-        error: 'No TMSID provided'
+        error: 'No ID provided'
       }, {
         status: 400,
         headers: {
@@ -131,10 +131,10 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     // Explicitly connect to Employeeattendance database
     const db = client.db('Employeeattendance');
-    
+
     // Check if already marked
     const existing = await db.collection(collectionName).findOne({
-      tmsId: tmsId,
+      id: id,
       date: currentDate.toISOString().split('T')[0]
     });
 
@@ -153,7 +153,7 @@ export async function POST(request: Request) {
 
     // Prepare attendance record with location
     const attendanceRecord = {
-      tmsId: tmsId,
+      id: id,
       date: currentDate.toISOString().split('T')[0],
       timeIn: currentDate.toISOString(),
       status: 'present',
@@ -201,7 +201,7 @@ function getMonthName(month: number): string {
     'September', 'October', 'November', 'December'
   ];
   return monthNames[month - 1];
-} 
+}
 
 
 

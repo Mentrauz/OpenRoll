@@ -15,7 +15,7 @@ export default function AccountSettings() {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     _id: '',
-    tmsId: '',
+    id: '',
     fullName: '',
     email: '',
     phone: '',
@@ -28,10 +28,10 @@ export default function AccountSettings() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isHR, setIsHR] = useState(false);
   const [canEditAccountSettings, setCanEditAccountSettings] = useState(false);
-  const [manageUsers, setManageUsers] = useState<{ tmsId: string; fullName?: string; role: UserRole }[]>([]);
+  const [manageUsers, setManageUsers] = useState<{ id: string; fullName?: string; role: UserRole }[]>([]);
   const [isSavingRole, setIsSavingRole] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ tmsId: '', name: '', password: '', role: 'supervisor' as UserRole });
+  const [newUser, setNewUser] = useState({ id: '', name: '', password: '', role: 'supervisor' as UserRole });
   const [isCreating, setIsCreating] = useState(false);
   const [roleAccess, setRoleAccess] = useState<{ routePermissions: Record<string, UserRole[]>; menuPermissions: Record<string, UserRole[]>; featurePermissions?: Record<string, UserRole[]> } | null>(null);
   const [isSavingAccess, setIsSavingAccess] = useState(false);
@@ -89,13 +89,13 @@ export default function AccountSettings() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const tmsId = localStorage.getItem('tmsId');
-        if (!tmsId) {
+        const id = localStorage.getItem('id');
+        if (!id) {
           toast.error('No user found. Please login again.');
           return;
         }
 
-        const response = await fetch(`/api/user?tmsId=${tmsId}`);
+        const response = await fetch(`/api/user?id=${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -103,7 +103,7 @@ export default function AccountSettings() {
           setFormData(prev => ({
             ...prev,
             _id: user._id || '',
-            tmsId: user.tmsId || '',
+            id: user.id || '',
             fullName: user.fullName || '',
             email: user.email || '',
             phone: user.phone || '',
@@ -172,7 +172,7 @@ export default function AccountSettings() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tmsId: formData.tmsId,
+          id: formData.id,
           fullName: formData.fullName,
           email: formData.email,
           phone: formData.phone,
@@ -214,8 +214,8 @@ export default function AccountSettings() {
     }
   };
 
-  const handleNewUserTmsIdChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewUser(v => ({ ...v, tmsId: e.target.value.toUpperCase() }));
+  const handleNewUserIdChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewUser(v => ({ ...v, id: e.target.value.toUpperCase() }));
   }, []);
 
   const handleNewUserNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -239,7 +239,7 @@ export default function AccountSettings() {
   ];
 
   const filteredUsers = manageUsers.filter(u =>
-    u.tmsId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (u.fullName && u.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
@@ -340,9 +340,9 @@ export default function AccountSettings() {
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-1">
-                            <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">TMS ID</label>
+                            <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">ID</label>
                             <div className="w-full px-4 py-2 bg-slate-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-slate-900 dark:text-white font-medium">
-                              {formData.tmsId}
+                              {formData.id}
                             </div>
                           </div>
 
@@ -495,14 +495,14 @@ export default function AccountSettings() {
                             </tr>
                           )}
                           {!usersLoading && filteredUsers.map(u => (
-                            <tr key={u.tmsId} className="hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-colors">
-                              <td className="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-900 dark:text-white">{u.tmsId}</td>
+                            <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-colors">
+                              <td className="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-900 dark:text-white">{u.id}</td>
                               <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">{u.fullName || '-'}</td>
                               <td className="px-4 py-3 whitespace-nowrap w-[200px]">
                                 <AnimatedSelect
-                                  id={`user-role-${u.tmsId}`}
+                                  id={`user-role-${u.id}`}
                                   value={u.role}
-                                  onChange={(value) => setManageUsers(prev => prev.map(m => m.tmsId === u.tmsId ? { ...m, role: value as UserRole } : m))}
+                                  onChange={(value) => setManageUsers(prev => prev.map(m => m.id === u.id ? { ...m, role: value as UserRole } : m))}
                                   options={((isAdmin ? ['admin', 'accounts', 'data-operations', 'supervisor', 'hr'] : ['accounts', 'data-operations', 'supervisor', 'hr']) as UserRole[]).map(r => ({
                                     value: r,
                                     label: r
@@ -516,12 +516,12 @@ export default function AccountSettings() {
                                 <button
                                   onClick={async () => {
                                     try {
-                                      setIsSavingRole(u.tmsId);
+                                      setIsSavingRole(u.id);
                                       const res = await fetch('/api/admin/users/update-role', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         credentials: 'include',
-                                        body: JSON.stringify({ tmsId: u.tmsId, role: u.role })
+                                        body: JSON.stringify({ id: u.id, role: u.role })
                                       });
                                       if (res.ok) {
                                         toast.success('Role updated');
@@ -534,10 +534,10 @@ export default function AccountSettings() {
                                       setIsSavingRole(null);
                                     }
                                   }}
-                                  disabled={isSavingRole === u.tmsId || !canEditAccountSettings || (!isAdmin && !isHR)}
+                                  disabled={isSavingRole === u.id || !canEditAccountSettings || (!isAdmin && !isHR)}
                                   className="px-3 py-1 text-xs font-medium text-white bg-slate-900 dark:bg-white dark:text-slate-900 rounded hover:opacity-90 disabled:opacity-50 transition-opacity"
                                 >
-                                  {isSavingRole === u.tmsId ? 'Saving...' : 'Save'}
+                                  {isSavingRole === u.id ? 'Saving...' : 'Save'}
                                 </button>
                               </td>
                             </tr>
@@ -776,8 +776,8 @@ export default function AccountSettings() {
                           <div className="space-y-1">
                             <label className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">ID <span className="text-red-500">*</span></label>
                             <input
-                              value={newUser.tmsId}
-                              onChange={handleNewUserTmsIdChange}
+                              value={newUser.id}
+                              onChange={handleNewUserIdChange}
                               placeholder="e.g. TMS010"
                               className="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
@@ -827,7 +827,7 @@ export default function AccountSettings() {
                           </button>
                           <button
                             onClick={async () => {
-                              if (!newUser.tmsId.trim() || !newUser.password.trim()) {
+                              if (!newUser.id.trim() || !newUser.password.trim()) {
                                 toast.error('ID and Password are required');
                                 return;
                               }
@@ -838,7 +838,7 @@ export default function AccountSettings() {
                                   headers: { 'Content-Type': 'application/json' },
                                   credentials: 'include',
                                   body: JSON.stringify({
-                                    tmsId: newUser.tmsId,
+                                    id: newUser.id,
                                     password: newUser.password,
                                     name: newUser.name || undefined,
                                     role: newUser.role,
@@ -847,9 +847,9 @@ export default function AccountSettings() {
                                 const data = await res.json();
                                 if (res.ok) {
                                   toast.success('User created');
-                                  setManageUsers(prev => [{ tmsId: data.user.tmsId, fullName: data.user.fullName, role: data.user.role }, ...prev]);
+                                  setManageUsers(prev => [{ id: data.user.id, fullName: data.user.fullName, role: data.user.role }, ...prev]);
                                   setIsCreateOpen(false);
-                                  setNewUser({ tmsId: '', name: '', password: '', role: 'supervisor' });
+                                  setNewUser({ id: '', name: '', password: '', role: 'supervisor' });
                                 } else {
                                   toast.error(data.error || 'Failed to create user');
                                 }
@@ -880,7 +880,7 @@ export default function AccountSettings() {
 
 // Sub-component for Password Management to isolate state and prevent focus loss
 interface PasswordManagementSectionProps {
-  users: { tmsId: string; fullName?: string; role: UserRole }[];
+  users: { id: string; fullName?: string; role: UserRole }[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   searchIconRef: React.RefObject<LordIconRef>;
@@ -901,13 +901,13 @@ const PasswordManagementSection: React.FC<PasswordManagementSectionProps> = ({
   const [resettingUser, setResettingUser] = useState<string | null>(null);
   const [resetPasswordValue, setResetPasswordValue] = useState<string>('');
 
-  const handleResetPasswordChange = (tmsId: string, value: string) => {
-    setResettingUser(tmsId);
+  const handleResetPasswordChange = (id: string, value: string) => {
+    setResettingUser(id);
     setResetPasswordValue(value);
   };
 
   const filteredUsers = users.filter(u =>
-    u.tmsId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (u.fullName && u.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
@@ -959,8 +959,8 @@ const PasswordManagementSection: React.FC<PasswordManagementSectionProps> = ({
               </tr>
             )}
             {!usersLoading && filteredUsers.map(u => (
-              <tr key={u.tmsId} className="hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-colors">
-                <td className="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-900 dark:text-white">{u.tmsId}</td>
+              <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-colors">
+                <td className="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-900 dark:text-white">{u.id}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">{u.fullName || '-'}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 capitalize">
@@ -970,8 +970,8 @@ const PasswordManagementSection: React.FC<PasswordManagementSectionProps> = ({
                 <td className="px-4 py-3 whitespace-nowrap">
                   <input
                     type="password"
-                    value={resettingUser === u.tmsId ? resetPasswordValue : ''}
-                    onChange={e => handleResetPasswordChange(u.tmsId, e.target.value)}
+                    value={resettingUser === u.id ? resetPasswordValue : ''}
+                    onChange={e => handleResetPasswordChange(u.id, e.target.value)}
                     placeholder={!canEditAccountSettings ? 'No permission' : 'New password'}
                     disabled={!canEditAccountSettings || (!isAdmin && u.role === 'admin')}
                     className="w-full max-w-[180px] px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
@@ -980,7 +980,7 @@ const PasswordManagementSection: React.FC<PasswordManagementSectionProps> = ({
                 <td className="px-4 py-3 whitespace-nowrap text-right">
                   <button
                     onClick={async () => {
-                      if (!resetPasswordValue || resettingUser !== u.tmsId) {
+                      if (!resetPasswordValue || resettingUser !== u.id) {
                         toast.error('Enter a new password');
                         return;
                       }
@@ -989,7 +989,7 @@ const PasswordManagementSection: React.FC<PasswordManagementSectionProps> = ({
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           credentials: 'include',
-                          body: JSON.stringify({ tmsId: u.tmsId, newPassword: resetPasswordValue })
+                          body: JSON.stringify({ id: u.id, newPassword: resetPasswordValue })
                         });
                         if (res.ok) {
                           toast.success('Password reset');

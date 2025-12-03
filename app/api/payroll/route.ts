@@ -7,9 +7,9 @@ export async function GET() {
   try {
     await connectDB()
     const employees = await User.find({ role: 'user' })
-      .select('tmsId name department')
+      .select('id name department')
       .sort({ name: 1 })
-    
+
     return NextResponse.json(employees, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     await connectDB()
-    
+
     // Verify employee exists
     const employee = await User.findById(validation.data.employeeId)
     if (!employee) {
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       }
     )
   }
-} 
+}
 
 
 

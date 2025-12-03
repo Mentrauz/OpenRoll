@@ -4,14 +4,14 @@ import { connectToDatabase } from '@/lib/mongodb';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const tmsId = searchParams.get('tmsId');
+    const id = searchParams.get('id');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
-    if (!tmsId) {
+    if (!id) {
       return NextResponse.json({
         success: false,
-        error: 'No TMSID provided'
+        error: 'No ID provided'
       }, { status: 400 });
     }
 
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
           const collectionData = await db
             .collection(collectionName)
             .find({
-              tmsId,
+              id,
               date: {
                 $gte: startDate,
                 $lte: endDate
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
 
       history = await db
         .collection(collectionName)
-        .find({ tmsId })
+        .find({ id })
         .sort({ date: -1 })
         .toArray();
     }
@@ -89,7 +89,7 @@ function getMonthName(month: number): string {
     'September', 'October', 'November', 'December'
   ];
   return monthNames[month - 1];
-} 
+}
 
 
 

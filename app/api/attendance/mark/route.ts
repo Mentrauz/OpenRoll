@@ -5,12 +5,12 @@ import PendingChange from '@/models/PendingChange';
 
 export async function POST(request: Request) {
   try {
-    const { tmsId } = await request.json();
+    const { id } = await request.json();
 
-    if (!tmsId) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'ID is required' 
+    if (!id) {
+      return NextResponse.json({
+        success: false,
+        error: 'ID is required'
       }, { status: 400 });
     }
 
@@ -22,22 +22,22 @@ export async function POST(request: Request) {
       const session = cookieStore.get('sessionUser');
       if (session?.value) {
         const parsed = JSON.parse(session.value);
-        markedBy = parsed?.tmsId || null;
+        markedBy = parsed?.id || null;
         userRole = parsed?.userRole || null;
       }
-    } catch {}
+    } catch { }
 
     const { db: defaultDb } = await connectDB();
     const db = defaultDb.client.db('Employeeattendance');
-    
+
     // Get current date and format collection name
     const now = new Date();
     const dateString = now.toISOString().split('T')[0];
     const monthYear = `${getMonthName(now.getMonth() + 1)}_${now.getFullYear()}`;
-    
+
     // Check if attendance already marked for today
     const existingRecord = await db.collection(monthYear).findOne({
-      tmsId,
+      id,
       date: dateString
     });
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         requestedByRole: userRole || 'data-operations',
         requestedAt: now,
         changeData: {
-          tmsId,
+          id,
           date: dateString,
           timeIn: now.toISOString(),
           status: 'present',
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
         },
         targetCollection: monthYear,
         targetDatabase: 'Employeeattendance',
-        description: `Attendance mark for ${tmsId} on ${dateString}`
+        description: `Attendance mark for ${id} on ${dateString}`
       });
 
       return NextResponse.json({
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
 
     // If user IS admin, mark directly
     await db.collection(monthYear).insertOne({
-      tmsId,
+      id,
       date: dateString,
       timeIn: now.toISOString(),
       status: 'present',
@@ -108,7 +108,7 @@ function getMonthName(month: number): string {
     'September', 'October', 'November', 'December'
   ];
   return monthNames[month - 1];
-} 
+}
 
 
 

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
 
     // Get user session
     let userRole: string | null = null;
@@ -34,35 +34,35 @@ export async function POST(request: Request) {
       const session = cookieStore.get('sessionUser');
       if (session?.value) {
         const parsed = JSON.parse(session.value);
-        uploadedBy = parsed?.tmsId || null;
+        uploadedBy = parsed?.id || null;
         userRole = parsed?.userRole || null;
       }
-    } catch {}
+    } catch { }
 
     const client = await clientPromise;
     const employeesDb = client.db("Employees");
-    
+
     // Debug: List all collections
     const collections = await employeesDb.listCollections().toArray();
-    
+
     // Format unit name to match collection naming convention
     const formattedUnit = unit.toUpperCase().replace(/ /g, '_');
-    
+
     const unitCollection = employeesDb.collection(formattedUnit);
 
     // Transform and verify each employee
-    const transformedRecords = [];
+    const transformedRecords: any[] = [];
     const invalidEmployees = [];
 
     for (const record of jsonData) {
       const empId = record['EMPCODE']?.toString() || '';
-      
+
       if (!empId) continue;
 
       // Debug: Log the search attempt
-      
+
       const employeeExists = await unitCollection.findOne({ empId });
-      
+
       // Debug: Log the search result
 
       if (!employeeExists) {
@@ -141,7 +141,19 @@ export async function POST(request: Request) {
       await attendanceDb.createCollection(collectionName);
     }
 
-    const collection = attendanceDb.collection(collectionName);
+    interface AttendanceUnit {
+      unit: string;
+      records: any[];
+    }
+
+    interface AttendanceDocument {
+      month: string;
+      units: AttendanceUnit[];
+      createdAt: Date;
+      updatedAt: Date;
+    }
+
+    const collection = attendanceDb.collection<AttendanceDocument>(collectionName);
     const existingDoc = await collection.findOne({ month });
 
     if (!existingDoc) {
@@ -156,7 +168,7 @@ export async function POST(request: Request) {
       });
     } else {
       const unitExists = existingDoc.units?.some((u: any) => u.unit === unit);
-      
+
       if (!unitExists) {
         await collection.updateOne(
           { month },
@@ -198,7 +210,7 @@ export async function POST(request: Request) {
       error: 'Failed to upload attendance records'
     }, { status: 500 });
   }
-} 
+}
 
 
 

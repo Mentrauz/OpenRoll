@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('sessionUser');
-    
+
     if (!session?.value) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -31,9 +31,9 @@ export async function GET() {
     ]);
 
     // Get user's own pending changes count
-    const myPendingCount = await PendingChange.countDocuments({ 
+    const myPendingCount = await PendingChange.countDocuments({
       status: 'pending',
-      requestedBy: sessionData.tmsId
+      requestedBy: sessionData.id
     });
 
     return NextResponse.json({

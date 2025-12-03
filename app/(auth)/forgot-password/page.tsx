@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 export default function ForgotPasswordPage() {
-  const [tmsId, setTmsId] = useState('')
+  const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -52,16 +52,16 @@ export default function ForgotPasswordPage() {
               <div className="text-red-700 text-sm">{error}</div>
             )}
             <div>
-              <label htmlFor="tmsId" className="block text-sm font-medium text-slate-600">
+              <label htmlFor="id" className="block text-sm font-medium text-slate-600">
                 ID
               </label>
               <input
-                id="tmsId"
-                name="tmsId"
+                id="id"
+                name="id"
                 type="text"
                 required
-                value={tmsId}
-                onChange={(e) => setTmsId(e.target.value)}
+                value={id}
+                onChange={(e) => setId(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               />
             </div>

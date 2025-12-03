@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const userSchema = z.object({
-  tmsId: z.string().min(1, 'ID is required'),
+  id: z.string().min(1, 'ID is required'),
   name: z.string().trim().min(1, 'Name is required').optional(),
   password: z.string().min(1, 'Password is required'),
   role: z.enum(['admin', 'accounts', 'data-operations', 'supervisor', 'hr']).default('supervisor'),
@@ -10,7 +10,7 @@ export const userSchema = z.object({
 })
 
 export const loginSchema = z.object({
-  tmsId: z.string().min(1, 'ID is required'),
+  id: z.string().min(1, 'ID is required'),
   password: z.string().min(1, 'Password is required')
 })
 

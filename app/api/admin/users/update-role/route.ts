@@ -22,17 +22,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { tmsId, role } = await request.json();
+    const { id, role } = await request.json();
     const validRoles: UserRole[] = ['admin', 'accounts', 'data-operations', 'supervisor', 'hr'];
 
-    if (!tmsId || !validRoles.includes(role)) {
+    if (!id || !validRoles.includes(role)) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
     const client = await clientPromise;
     const db = client.db('Users');
     const result = await db.collection('Admin').updateOne(
-      { tmsId },
+      { id },
       { $set: { role } }
     );
 

@@ -19,7 +19,7 @@ interface AttendanceRecord {
   date: string;
   timeIn: string;
   status: 'present' | 'absent';
-  tmsId: string;
+  id: string;
   fullName?: string;
   location?: {
     latitude: number;
@@ -29,7 +29,7 @@ interface AttendanceRecord {
 }
 
 interface EmployeeAttendanceData {
-  tmsId: string;
+  id: string;
   fullName: string;
   role: string;
   type: 'Fulltime' | 'Contractor';
@@ -62,9 +62,9 @@ export default function AttendanceClient() {
   const [permissionsConfig, setPermissionsConfig] = useState<Partial<RolePermissionsConfig> | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const searchIconRef = useRef<LordIconRef>(null);
-  const [currentUserTmsId, setCurrentUserTmsId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const chartDataCache = useRef<{ key: string; data: any[] } | null>(null);
-  
+
   // Helper function to format date as YYYY-MM-DD (local date)
   const formatDateForPicker = (date: Date) => {
     const year = date.getFullYear();
@@ -305,12 +305,12 @@ export default function AttendanceClient() {
 
       // Compare key properties that matter for the chart
       if (prev.date !== next.date ||
-          prev.loginHour !== next.loginHour ||
-          prev.status !== next.status ||
-          prev.fullDate !== next.fullDate ||
-          prev.isPresent !== next.isPresent ||
-          prev.isFutureDate !== next.isFutureDate ||
-          prev.loginTime !== next.loginTime) {
+        prev.loginHour !== next.loginHour ||
+        prev.status !== next.status ||
+        prev.fullDate !== next.fullDate ||
+        prev.isPresent !== next.isPresent ||
+        prev.isFutureDate !== next.isFutureDate ||
+        prev.loginTime !== next.loginTime) {
         return false;
       }
     }
@@ -321,21 +321,21 @@ export default function AttendanceClient() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const tmsId = localStorage.getItem('tmsId');
-        if (!tmsId) {
+        const id = localStorage.getItem('id');
+        if (!id) {
           toast.error('No user found. Please login again.');
           return;
         }
 
-        setCurrentUserTmsId(tmsId); // Store tmsId in state
+        setCurrentUserId(id); // Store id in state
 
-        const response = await fetch(`/api/user?tmsId=${tmsId}`);
+        const response = await fetch(`/api/user?id=${id}`);
         const data = await response.json();
 
         if (response.ok) {
           setUserData(data.user); // Extract user data from the nested response
-          checkTodayAttendance(tmsId);
-          fetchAttendanceHistory(tmsId, startDate, endDate);
+          checkTodayAttendance(id);
+          fetchAttendanceHistory(id, startDate, endDate);
         } else {
           toast.error(data.error || 'Failed to fetch user data');
         }
@@ -372,14 +372,14 @@ export default function AttendanceClient() {
 
   // Refetch attendance history when date range changes
   useEffect(() => {
-    if (userData?.tmsId && startDate && endDate) {
-      fetchAttendanceHistory(userData.tmsId, startDate, endDate);
+    if (userData?.id && startDate && endDate) {
+      fetchAttendanceHistory(userData.id, startDate, endDate);
     }
-  }, [startDate, endDate, userData?.tmsId]);
+  }, [startDate, endDate, userData?.id]);
 
-  const checkTodayAttendance = async (tmsId: string) => {
+  const checkTodayAttendance = async (id: string) => {
     try {
-      const response = await fetch(`/api/attendance/check?tmsId=${tmsId}`);
+      const response = await fetch(`/api/attendance/check?id=${id}`);
       const data = await response.json();
       setHasMarkedToday(data.hasMarkedToday);
     } catch (error) {
@@ -387,9 +387,9 @@ export default function AttendanceClient() {
     }
   };
 
-  const fetchAttendanceHistory = async (tmsId: string, startDate?: Date, endDate?: Date) => {
+  const fetchAttendanceHistory = async (id: string, startDate?: Date, endDate?: Date) => {
     try {
-      let url = `/api/attendance/history?tmsId=${tmsId}`;
+      let url = `/api/attendance/history?id=${id}`;
       if (startDate && endDate) {
         url += `&startDate=${formatDateForAPI(startDate)}&endDate=${formatDateForAPI(endDate)}`;
       }
@@ -404,12 +404,12 @@ export default function AttendanceClient() {
   };
 
   const markAttendance = async () => {
-    const tmsId = localStorage.getItem('tmsId');
-    if (!tmsId) {
+    const id = localStorage.getItem('id');
+    if (!id) {
       toast.error('Please login first');
       return;
     }
-    
+
     try {
       // First get location
       if (!navigator.geolocation) {
@@ -426,7 +426,7 @@ export default function AttendanceClient() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              tmsId: tmsId,
+              id: id,
               location: {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
@@ -436,11 +436,11 @@ export default function AttendanceClient() {
           });
 
           const data = await response.json();
-          
+
           if (data.success) {
             toast.success('Attendance marked successfully!');
             setHasMarkedToday(true);
-            await fetchAttendanceHistory(tmsId, startDate, endDate);
+            await fetchAttendanceHistory(id, startDate, endDate);
           } else {
             toast.error(data.error || 'Failed to mark attendance');
           }
@@ -561,14 +561,14 @@ export default function AttendanceClient() {
       const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), date);
       const dateString = formatDateForAPI(currentDate);
       const today = new Date();
-      
+
       const isToday = date === today.getDate() &&
-                     today.getMonth() === currentDate.getMonth() &&
-                     today.getFullYear() === currentDate.getFullYear();
-      
+        today.getMonth() === currentDate.getMonth() &&
+        today.getFullYear() === currentDate.getFullYear();
+
       const isSelected = selectedDate?.getDate() === date &&
-                        selectedDate?.getMonth() === currentDate.getMonth() &&
-                        selectedDate?.getFullYear() === currentDate.getFullYear();
+        selectedDate?.getMonth() === currentDate.getMonth() &&
+        selectedDate?.getFullYear() === currentDate.getFullYear();
 
       // Find attendance records for this date
       const recordsForDay = selectedDateRecords.filter(
@@ -618,20 +618,20 @@ export default function AttendanceClient() {
 
   const exportToPDF = async () => {
     setExportLoading(true);
-    
+
     try {
       let records: AttendanceRecord[] = [];
       let title = '';
-      
+
       if (exportOptions.type === 'month') {
         // Export entire month - ALL employees
         const month = currentMonth.getMonth() + 1;
         const year = currentMonth.getFullYear();
         const monthName = months[currentMonth.getMonth()];
-        
+
         const response = await fetch(`/api/attendance/export?month=${month}&year=${year}`);
         const data = await response.json();
-        
+
         if (data.success) {
           records = data.records;
           title = `Attendance Report - All Employees - ${monthName} ${year}`;
@@ -644,10 +644,10 @@ export default function AttendanceClient() {
         const dateString = formatDateForAPI(exportOptions.date);
         const month = exportOptions.date.getMonth() + 1;
         const year = exportOptions.date.getFullYear();
-        
+
         const response = await fetch(`/api/attendance/export?month=${month}&year=${year}&date=${dateString}`);
         const data = await response.json();
-        
+
         if (data.success) {
           records = data.records;
           title = `Attendance Report - All Employees - ${exportOptions.date.toLocaleDateString()}`;
@@ -664,10 +664,10 @@ export default function AttendanceClient() {
 
       // Validate records structure
       //
-      const validRecords = records.filter(record => 
-        record && typeof record === 'object' && record.tmsId && record.date
+      const validRecords = records.filter(record =>
+        record && typeof record === 'object' && record.id && record.date
       );
-      
+
       if (validRecords.length === 0) {
         toast.error('No valid attendance records found');
         return;
@@ -678,35 +678,35 @@ export default function AttendanceClient() {
       // Import jsPDF and autoTable
       const { default: jsPDF } = await import('jspdf');
       const autoTable = await import('jspdf-autotable');
-      
+
       //
-      
+
       // Create new jsPDF instance
       const doc = new jsPDF();
-      
+
       // Store the autoTable function for direct use
       const autoTableFn = autoTable.default;
-      
+
       //
-      
+
       // Add title
       doc.setFontSize(18);
       doc.text(title, 14, 22);
-      
+
       // Add company info
       doc.setFontSize(12);
       doc.text('Company Name: YOUR COMPANY NAME', 14, 32);
-      
+
       // Add date of generation
       doc.text(`Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 14, 40);
-      
+
       // Add report summary
       doc.text(`Total Records: ${validRecords.length}`, 14, 48);
-      
+
       if (exportOptions.type === 'month') {
         // Group records by date for month report
         const recordsByDate: { [key: string]: AttendanceRecord[] } = {};
-        
+
         // Sort and group records by date
         validRecords.sort((a, b) => {
           // First sort by date
@@ -718,53 +718,53 @@ export default function AttendanceClient() {
           // Then by time if dates are the same
           return new Date(a.timeIn).getTime() - new Date(b.timeIn).getTime();
         });
-        
+
         validRecords.forEach(record => {
           if (!recordsByDate[record.date]) {
             recordsByDate[record.date] = [];
           }
           recordsByDate[record.date].push(record);
         });
-        
+
         // Start position for content
         let yPos = 58;
-        
+
         // For each date, create a section
         for (const date in recordsByDate) {
           const dateRecords = recordsByDate[date];
-          const formattedDate = new Date(date).toLocaleDateString('en-US', { 
+          const formattedDate = new Date(date).toLocaleDateString('en-US', {
             weekday: 'long',
-            month: 'short', 
-            day: 'numeric', 
+            month: 'short',
+            day: 'numeric',
             year: 'numeric'
           });
-          
+
           // Add date header
           doc.setFontSize(14);
           doc.setTextColor(75, 0, 130); // Purple color
-          
+
           // Check if we need a new page
           if (yPos > 250) {
             doc.addPage();
             yPos = 20;
           }
-          
+
           doc.text(`${formattedDate} (${dateRecords.length} employees)`, 14, yPos);
           yPos += 8;
-          
+
           // Create table for this date
           const tableColumn = ["ID", "Employee Name", "Time In", "Status", "Location"];
           const tableRows = dateRecords.map(record => [
-            record.tmsId,
+            record.id,
             record.fullName || 'N/A',
             new Date(record.timeIn).toLocaleTimeString(),
             record.status,
             record.location ? 'Location recorded' : 'N/A'
           ]);
-          
+
           // Reset text color for table
           doc.setTextColor(0, 0, 0);
-          
+
           // Fix the autoTable call
           //
           try {
@@ -780,7 +780,7 @@ export default function AttendanceClient() {
           } catch (tableError) {
             throw new Error(`Failed to create table: ${tableError.message}`);
           }
-          
+
           // Update position for next section
           yPos = (doc as any).lastAutoTable.finalY + 15;
         }
@@ -788,14 +788,14 @@ export default function AttendanceClient() {
         // For specific date reports, use the original table format
         const tableColumn = ["ID", "Employee Name", "Date", "Time In", "Status", "Location"];
         const tableRows = validRecords.map(record => [
-          record.tmsId,
+          record.id,
           record.fullName || 'N/A',
           new Date(record.date).toLocaleDateString(),
           new Date(record.timeIn).toLocaleTimeString(),
           record.status,
           record.location ? 'Location recorded' : 'N/A'
         ]);
-        
+
         // Fix the autoTable call
         //
         try {
@@ -811,11 +811,11 @@ export default function AttendanceClient() {
           throw new Error(`Failed to create specific date table: ${tableError.message}`);
         }
       }
-      
+
       // Save PDF
       //
       doc.save(`attendance_report_${Date.now()}.pdf`);
-      
+
       toast.success('PDF exported successfully!');
       setExportOptions({ ...exportOptions, isOpen: false });
     } catch (error) {
@@ -969,29 +969,29 @@ export default function AttendanceClient() {
         const data = await response.json();
 
         if (data.success && data.records.length > 0) {
-          // Get unique TMS IDs from attendance records
-          const uniqueTmsIds = [...new Set(data.records.map((record: AttendanceRecord) => record.tmsId))];
+          // Get unique IDs from attendance records
+          const uniqueIds = [...new Set(data.records.map((record: AttendanceRecord) => record.id))];
 
-          // Fetch employee names for each TMS ID
-          const employeePromises = uniqueTmsIds.map(async (tmsId: string) => {
+          // Fetch employee names for each ID
+          const employeePromises = uniqueIds.map(async (id: string) => {
             try {
-              const userResponse = await fetch(`/api/user?tmsId=${tmsId}`);
+              const userResponse = await fetch(`/api/user?id=${id}`);
               const userData = await userResponse.json();
               const firstName = userData.user?.firstName || '';
               const lastName = userData.user?.lastName || '';
               const fullName = `${firstName} ${lastName}`.trim();
 
               return {
-                tmsId,
-                fullName: fullName || tmsId, // Use TMS ID if name is empty
+                id,
+                fullName: fullName || id, // Use ID if name is empty
                 role: userData.user?.role || 'Employee',
                 type: 'Fulltime' as const
               };
             } catch (error) {
-              console.warn(`Failed to fetch user data for TMS ID ${tmsId}:`, error);
+              console.warn(`Failed to fetch user data for ID ${id}:`, error);
               return {
-                tmsId,
-                fullName: tmsId, // Use TMS ID as fallback
+                id,
+                fullName: id, // Use ID as fallback
                 role: 'Employee',
                 type: 'Fulltime' as const
               };
@@ -1002,7 +1002,7 @@ export default function AttendanceClient() {
 
           // Create employee data with actual names
           const employeeData = employeeInfos.map(employee => ({
-            tmsId: employee.tmsId,
+            id: employee.id,
             fullName: employee.fullName,
             role: employee.role,
             type: employee.type,
@@ -1058,13 +1058,13 @@ export default function AttendanceClient() {
   const attendanceChartData = useMemo(() => {
 
     // Early return with stable empty array
-    if (!currentUserTmsId || attendanceHistory.length === 0) {
+    if (!currentUserId || attendanceHistory.length === 0) {
       chartDataCache.current = null;
       return [];
     }
 
     // Create a stable key for the current state
-    const stateKey = `${currentUserTmsId}-${startDate.getTime()}-${endDate.getTime()}-${attendanceHistory.length}`;
+    const stateKey = `${currentUserId}-${startDate.getTime()}-${endDate.getTime()}-${attendanceHistory.length}`;
 
     // Check if we have cached data for this exact state
     if (chartDataCache.current && chartDataCache.current.key === stateKey) {
@@ -1085,7 +1085,7 @@ export default function AttendanceClient() {
     const result = daysInRange.map(date => {
       const dateString = format(date, 'yyyy-MM-dd');
       const dayAttendance = attendanceHistory.find(record =>
-        record.date.startsWith(dateString) && record.tmsId === currentUserTmsId
+        record.date.startsWith(dateString) && record.id === currentUserId
       );
 
       const isFutureDate = date > today; // Check if this date is in the future
@@ -1133,15 +1133,15 @@ export default function AttendanceClient() {
     // Cache the result
     chartDataCache.current = { key: stateKey, data: result };
     return result;
-  }, [currentUserTmsId, attendanceHistory, startDate, endDate]);
+  }, [currentUserId, attendanceHistory, startDate, endDate]);
 
   // Filter attendance records based on search
   const filteredAttendanceRecords = useMemo(() => {
     if (!searchQuery) return selectedDateRecords;
     const query = searchQuery.toLowerCase();
     return selectedDateRecords.filter(record =>
-      (record.fullName || record.tmsId).toLowerCase().includes(query) ||
-      record.tmsId.toLowerCase().includes(query)
+      (record.fullName || record.id).toLowerCase().includes(query) ||
+      record.id.toLowerCase().includes(query)
     );
   }, [selectedDateRecords, searchQuery]);
 
@@ -1174,11 +1174,10 @@ export default function AttendanceClient() {
             <button
               onClick={markAttendance}
               disabled={hasMarkedToday}
-              className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-                hasMarkedToday
-                  ? 'bg-gray-200 text-gray-700 cursor-not-allowed'
-                  : 'bg-gray-800 text-white hover:bg-gray-900'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${hasMarkedToday
+                ? 'bg-gray-200 text-gray-700 cursor-not-allowed'
+                : 'bg-gray-800 text-white hover:bg-gray-900'
+                }`}
             >
               {hasMarkedToday ? (
                 <span className="flex items-center gap-2">
@@ -1201,8 +1200,8 @@ export default function AttendanceClient() {
 
         {/* Timesheet Header */}
         <div className="mb-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Timesheet</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Timesheet</h2>
             <div className="flex items-center gap-3">
               <div className="relative" data-download-button>
                 <button
@@ -1326,7 +1325,7 @@ export default function AttendanceClient() {
                 // Check if current user has attendance for this date
                 const isUserPresent = attendanceHistory.some(record => {
                   const recordDate = new Date(record.date);
-                  return recordDate.toDateString() === day.toDateString() && record.status === 'present' && record.tmsId === currentUserTmsId;
+                  return recordDate.toDateString() === day.toDateString() && record.status === 'present' && record.id === currentUserId;
                 });
 
                 return (
@@ -1350,7 +1349,7 @@ export default function AttendanceClient() {
 
           {/* Search */}
           <div className="mb-4">
-            <div 
+            <div
               className="relative w-72"
               onMouseEnter={() => searchIconRef.current?.playAnimation()}
               onMouseLeave={() => searchIconRef.current?.goToFirstFrame()}
@@ -1366,7 +1365,7 @@ export default function AttendanceClient() {
               </div>
               <input
                 type="text"
-                placeholder="Search employee or TMS ID"
+                placeholder="Search employee or ID"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1389,15 +1388,15 @@ export default function AttendanceClient() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredAttendanceRecords.map((record, index) => (
-                  <tr key={`${record.tmsId}-${index}`} className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <tr key={`${record.id}-${index}`} className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-700 to-pink-700 flex items-center justify-center text-white font-semibold text-sm">
-                          {(record.fullName || record.tmsId)[0]}
+                          {(record.fullName || record.id)[0]}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">{record.fullName || record.tmsId}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">{record.tmsId}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{record.fullName || record.id}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{record.id}</div>
                         </div>
                       </div>
                     </td>

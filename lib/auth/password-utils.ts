@@ -22,8 +22,8 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 /**
  * Validate credentials format and requirements
  */
-export async function validateCredentials(tmsId: string, password: string): Promise<void> {
-  if (!tmsId || !password) {
+export async function validateCredentials(id: string, password: string): Promise<void> {
+  if (!id || !password) {
     throw new Error('Missing credentials');
   }
   // No strength requirements; only presence is checked here

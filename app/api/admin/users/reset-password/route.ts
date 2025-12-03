@@ -23,16 +23,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { tmsId, newPassword } = await request.json()
+    const { id, newPassword } = await request.json()
 
-    if (!tmsId || typeof tmsId !== 'string' || !newPassword || typeof newPassword !== 'string') {
+    if (!id || typeof id !== 'string' || !newPassword || typeof newPassword !== 'string') {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
     }
 
     const client = await clientPromise
     const db = client.db('Users')
 
-    const targetUser = await db.collection('Admin').findOne({ tmsId })
+    const targetUser = await db.collection('Admin').findOne({ id })
     if (!targetUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const hashed = await hashPassword(newPassword)
 
     await db.collection('Admin').updateOne(
-      { tmsId },
+      { id },
       { $set: { password: hashed, passwordAttempts: 0, lockoutUntil: null } }
     )
 

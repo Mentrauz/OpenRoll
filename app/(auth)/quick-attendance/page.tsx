@@ -6,13 +6,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function QuickAttendancePage() {
-  const [tmsId, setTmsId] = useState('');
+  const [id, setId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!tmsId.trim()) {
+
+    if (!id.trim()) {
       toast.error('Please enter your ID');
       return;
     }
@@ -35,7 +35,7 @@ export default function QuickAttendancePage() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              tmsId: tmsId.trim(),
+              id: id.trim(),
               location: {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude,
@@ -56,7 +56,7 @@ export default function QuickAttendancePage() {
                 color: '#fff',
               },
             });
-            setTmsId('');
+            setId('');
           } else {
             toast.error(data.error || 'Failed to mark attendance', {
               position: 'bottom-center',
@@ -92,7 +92,7 @@ export default function QuickAttendancePage() {
       <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 bg-slate-100">
         <div className="w-full max-w-md">
           <div className="mb-8 md:mb-12">
-            <Image 
+            <Image
               src="/images/tms-logo.svg"
               alt="TMS Logo"
               width={70}
@@ -108,7 +108,7 @@ export default function QuickAttendancePage() {
             </p>
           </div>
 
-          <form 
+          <form
             onSubmit={handleSubmit}
             className="space-y-4 md:space-y-6"
           >
@@ -119,8 +119,8 @@ export default function QuickAttendancePage() {
               <div>
                 <input
                   type="text"
-                  value={tmsId}
-                  onChange={(e) => setTmsId(e.target.value.toUpperCase())}
+                  value={id}
+                  onChange={(e) => setId(e.target.value.toUpperCase())}
                   placeholder="Enter your ID"
                   className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 text-slate-900 placeholder:text-slate-400"
                   disabled={isSubmitting}

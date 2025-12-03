@@ -6,7 +6,7 @@ export async function POST() {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('sessionUser');
-    
+
     if (!sessionCookie?.value) {
       return NextResponse.json({ error: 'No active session' }, { status: 401 });
     }
@@ -18,16 +18,16 @@ export async function POST() {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
-    if (!sessionData.tmsId) {
+    if (!sessionData.id) {
       return NextResponse.json({ error: 'Invalid session data' }, { status: 401 });
     }
 
     const client = await clientPromise;
     const db = client.db("Users");
-    
+
     // Get fresh user data from database
-    const user = await db.collection('Admin').findOne({ tmsId: sessionData.tmsId });
-    
+    const user = await db.collection('Admin').findOne({ id: sessionData.id });
+
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -44,7 +44,7 @@ export async function POST() {
       success: true,
       message: 'Session refreshed',
       user: {
-        tmsId: user.tmsId,
+        id: user.id,
         fullName: user.fullName,
         role: user.role
       }
@@ -69,7 +69,7 @@ export async function POST() {
       { status: 500 }
     );
   }
-} 
+}
 
 
 

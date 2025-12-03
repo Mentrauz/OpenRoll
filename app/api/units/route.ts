@@ -13,8 +13,8 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!data.unitName || data.unitName.trim() === '') {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           message: 'Unit name is required',
           receivedData: data
         },
@@ -30,14 +30,14 @@ export async function POST(request: Request) {
       const session = cookieStore.get('sessionUser');
       if (session?.value) {
         const parsed = JSON.parse(session.value);
-        createdBy = parsed?.tmsId || null;
+        createdBy = parsed?.id || null;
         userRole = parsed?.userRole || null;
       }
-    } catch {}
+    } catch { }
 
     // Handle unit number
-    const unitNumber = data.unitNumber !== undefined && data.unitNumber !== '' 
-      ? data.unitNumber.toString() 
+    const unitNumber = data.unitNumber !== undefined && data.unitNumber !== ''
+      ? data.unitNumber.toString()
       : '1';
 
     // Format the unit name consistently - only use for new units
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       await connectDB();
 
       const changeType = existingUnit ? 'unit_update' : 'unit_registration';
-      const description = existingUnit 
+      const description = existingUnit
         ? `Unit update: ${data.unitName.trim()}`
         : `New unit registration: ${data.unitName.trim()}`;
 
@@ -81,8 +81,8 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         success: true,
-        message: existingUnit 
-          ? 'Unit update submitted for admin approval' 
+        message: existingUnit
+          ? 'Unit update submitted for admin approval'
           : 'Unit registration submitted for admin approval',
         pending: true,
         changeId: pendingChange._id
@@ -151,7 +151,7 @@ export async function POST(request: Request) {
     if (existingUnit) {
       await unitsListCollection.updateOne(
         { _id: unitId },
-        { 
+        {
           $set: {
             ...formattedData,
             createdAt: existingUnit.createdAt
@@ -171,8 +171,8 @@ export async function POST(request: Request) {
 
   } catch (error) {
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: error.message || 'Failed to register/update unit',
         error: error
       },
@@ -185,7 +185,7 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db('Units');
-    
+
     // Keep existing functionality
     const unitsCollection = db.collection('UnitsList');
     const existingUnits = await unitsCollection.find({}).toArray();
@@ -215,7 +215,7 @@ export async function GET() {
       { status: 500 }
     );
   }
-} 
+}
 
 
 

@@ -168,7 +168,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [roleConfig, setRoleConfig] = useState<{ menuPermissions?: Record<string, UserRole[]> } | null>(null);
   const [permissionsVersion, setPermissionsVersion] = useState(0);
-  const [userInfo, setUserInfo] = useState<{ fullName?: string; tmsId?: string; userRole?: string } | null>(null);
+  const [userInfo, setUserInfo] = useState<{ fullName?: string; id?: string; userRole?: string } | null>(null);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -204,7 +204,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
           setUserRole(sessionData.userRole as UserRole);
         } else {
           // Emergency fallback - if logged in but no role, assume admin for TMS009
-          if (sessionData.isLoggedIn && sessionData.tmsId === 'TMS009') {
+          if (sessionData.isLoggedIn && sessionData.id === 'TMS009') {
             setUserRole('admin');
           } else {
             // Default fallback to admin if session exists but no role
@@ -224,7 +224,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
 
         setUserInfo({
           fullName: fullName,
-          tmsId: sessionData.tmsId || '',
+          id: sessionData.id || '',
           userRole: sessionData.userRole || 'admin'
         });
       } else {
@@ -232,11 +232,11 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
         setUserRole('admin');
         try {
           const storedName = localStorage.getItem('fullName') || sessionStorage.getItem('fullName') || '';
-          const storedTmsId = localStorage.getItem('tmsId') || '';
-          if (storedName || storedTmsId) {
+          const storedId = localStorage.getItem('id') || '';
+          if (storedName || storedId) {
             setUserInfo({
               fullName: storedName,
-              tmsId: storedTmsId,
+              id: storedId,
               userRole: 'admin'
             });
           } else {
@@ -728,7 +728,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                 {userInfo?.fullName || 'User'}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate leading-tight">
-                {userInfo?.tmsId || 'TMS009'}
+                {userInfo?.id || 'TMS009'}
               </p>
             </div>
 

@@ -32,10 +32,10 @@ export async function PUT(request: Request) {
       const session = cookieStore.get('sessionUser');
       if (session?.value) {
         const parsed = JSON.parse(session.value);
-        actor = parsed?.tmsId || null;
+        actor = parsed?.id || null;
         userRole = parsed?.userRole || null;
       }
-    } catch {}
+    } catch { }
 
     // Format unit name to match collection naming
     const formatUnitName = (unitName: string) => {
@@ -130,7 +130,7 @@ export async function PUT(request: Request) {
 
     // Compute changes based on existing document
     const watchedKeys = [
-      'empId','name','gender','dob','guardianName','relation','maritalStatus','unitName','doj','basic','hra','conv','washAll','othAll','grossRate','esicNumber','uanNumber','lwfId','mobileNumber','aadharNumber','aadharName','bankAccount','nameAsPerAadhar','ifscCode','bankName','aadharVerified','address'
+      'empId', 'name', 'gender', 'dob', 'guardianName', 'relation', 'maritalStatus', 'unitName', 'doj', 'basic', 'hra', 'conv', 'washAll', 'othAll', 'grossRate', 'esicNumber', 'uanNumber', 'lwfId', 'mobileNumber', 'aadharNumber', 'aadharName', 'bankAccount', 'nameAsPerAadhar', 'ifscCode', 'bankName', 'aadharVerified', 'address'
     ];
     const changes: { field: string; from: any; to: any }[] = [];
     if (existing) {
@@ -198,7 +198,7 @@ export async function PUT(request: Request) {
 export async function POST(request: Request) {
   try {
     const { db } = await connectToDatabase('Employees');
-    
+
     const body = await request.json();
     const { empId, unitName } = body;
 
@@ -225,7 +225,7 @@ export async function POST(request: Request) {
 
     const unitId = formatUnitName(unitName);
 
-    const result = await db.collection(unitId).deleteOne({ 
+    const result = await db.collection(unitId).deleteOne({
       empId: empId
     });
 
@@ -265,7 +265,7 @@ export async function POST(request: Request) {
       }
     });
   }
-} 
+}
 
 
 

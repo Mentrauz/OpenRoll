@@ -3,7 +3,7 @@ import { hashPassword } from '@/lib/auth/password-utils'
 import clientPromise from '@/lib/mongodb'
 
 export interface IUser {
-  tmsId: string
+  id: string
   password: string
   name: string
   role: 'admin' | 'accounts' | 'data-operations' | 'supervisor' | 'hr'
@@ -20,7 +20,7 @@ export interface CreateUserInput {
 }
 
 const userSchema = new mongoose.Schema<IUser>({
-  tmsId: {
+  id: {
     type: String,
     required: true,
     unique: true,

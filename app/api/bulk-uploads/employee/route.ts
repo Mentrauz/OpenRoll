@@ -45,7 +45,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    
+
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -59,10 +59,10 @@ export async function POST(request: Request) {
       const session = cookieStore.get('sessionUser');
       if (session?.value) {
         const parsed = JSON.parse(session.value);
-        uploadedBy = parsed?.tmsId || null;
+        uploadedBy = parsed?.id || null;
         userRole = parsed?.userRole || null;
       }
-    } catch {}
+    } catch { }
 
     // If user is NOT admin, store in pending changes
     if (userRole !== 'admin') {
@@ -98,12 +98,12 @@ export async function POST(request: Request) {
 
     // Group data by unit name
     const dataByUnit = new Map<string, any[]>();
-    
+
     // First pass: group records by unit
     jsonData.forEach((row: any) => {
       const unitName = row['Unit Name'] || 'DEFAULT';
       const collectionName = formatCollectionName(unitName);
-      
+
       if (!dataByUnit.has(collectionName)) {
         dataByUnit.set(collectionName, []);
       }
@@ -152,7 +152,7 @@ export async function POST(request: Request) {
               // Update only changed fields
               await collection.updateOne(
                 { empId: row['Employee ID']?.toString() },
-                { 
+                {
                   $set: {
                     ...updatedData,
                     updatedAt: new Date().toISOString()
@@ -221,7 +221,7 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
 
 
 

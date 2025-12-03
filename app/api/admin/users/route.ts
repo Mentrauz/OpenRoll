@@ -27,8 +27,8 @@ export async function GET() {
     const query: any = requesterRole === 'hr' ? { role: { $ne: 'admin' } } : {};
     const users = await db
       .collection('Admin')
-      .find(query, { projection: { _id: 0, tmsId: 1, fullName: 1, role: 1 } })
-      .sort({ tmsId: 1 })
+      .find(query, { projection: { _id: 0, id: 1, fullName: 1, role: 1 } })
+      .sort({ id: 1 })
       .toArray();
 
     return NextResponse.json({ users });

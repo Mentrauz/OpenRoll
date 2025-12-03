@@ -14,17 +14,17 @@ export async function POST(
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('sessionUser');
-    
+
     if (!session?.value) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const sessionData = JSON.parse(session.value);
-    
+
     // Only admins can approve changes
     if (sessionData.userRole !== 'admin') {
-      return NextResponse.json({ 
-        error: 'Only administrators can approve changes' 
+      return NextResponse.json({
+        error: 'Only administrators can approve changes'
       }, { status: 403 });
     }
 
@@ -37,14 +37,14 @@ export async function POST(
     const pendingChange = await PendingChange.findById(params.id);
 
     if (!pendingChange) {
-      return NextResponse.json({ 
-        error: 'Pending change not found' 
+      return NextResponse.json({
+        error: 'Pending change not found'
       }, { status: 404 });
     }
 
     if (pendingChange.status !== 'pending') {
-      return NextResponse.json({ 
-        error: 'This change has already been processed' 
+      return NextResponse.json({
+        error: 'This change has already been processed'
       }, { status: 400 });
     }
 
@@ -56,39 +56,39 @@ export async function POST(
       case 'employee_registration':
         result = await applyEmployeeRegistration(client, pendingChange);
         break;
-      
+
       case 'employee_update':
         result = await applyEmployeeUpdate(client, pendingChange);
         break;
-      
+
       case 'unit_registration':
       case 'unit_update':
         result = await applyUnitChange(client, pendingChange);
         break;
-      
+
       case 'attendance_mark':
         result = await applyAttendanceMark(client, pendingChange);
         break;
-      
+
       case 'bulk_upload':
         result = await applyBulkUpload(client, pendingChange);
         break;
-      
+
       default:
-        return NextResponse.json({ 
-          error: 'Unknown change type' 
+        return NextResponse.json({
+          error: 'Unknown change type'
         }, { status: 400 });
     }
 
     if (!result.success) {
-      return NextResponse.json({ 
-        error: result.error || 'Failed to apply change' 
+      return NextResponse.json({
+        error: result.error || 'Failed to apply change'
       }, { status: 500 });
     }
 
     // Mark as approved
     pendingChange.status = 'approved';
-    pendingChange.reviewedBy = sessionData.tmsId;
+    pendingChange.reviewedBy = sessionData.id;
     pendingChange.reviewedAt = new Date();
     pendingChange.reviewComments = comments;
     await pendingChange.save();
@@ -111,16 +111,16 @@ async function applyEmployeeRegistration(client: any, pendingChange: any) {
   try {
     const { unitName, ...employeeDetails } = pendingChange.changeData;
     const db = client.db('Employees');
-    
+
     const formattedUnit = unitName
       .trim()
       .toUpperCase()
       .replace(/\s+/g, '_')
       .replace(/\.\s+/, '._')
       .replace(/\((.*?)\)/, '($1)');
-    
+
     const collection = db.collection(formattedUnit);
-    
+
     const now = new Date();
     await collection.insertOne({
       ...employeeDetails,
@@ -144,7 +144,7 @@ async function applyEmployeeUpdate(client: any, pendingChange: any) {
   try {
     const db = client.db('Employees');
     const collection = db.collection(pendingChange.targetCollection);
-    
+
     const now = new Date();
     const updateData = {
       ...pendingChange.changeData,
@@ -171,14 +171,14 @@ async function applyUnitChange(client: any, pendingChange: any) {
   try {
     const unitsDb = client.db('Units');
     const data = pendingChange.changeData;
-    
+
     // Format the unit name consistently - only use for new units
     const sanitizedUnitName = data.unitName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-    
+
     // Determine if this is an update or new registration
     // Use targetDocumentId if available, then data._id, or fall back to sanitized name for new units
     const unitId = pendingChange.targetDocumentId || data._id || sanitizedUnitName;
-    
+
     const formattedData = {
       _id: unitId,
       type: "unit_details",
@@ -212,10 +212,10 @@ async function applyUnitChange(client: any, pendingChange: any) {
 async function applyAttendanceMark(client: any, pendingChange: any) {
   try {
     const db = client.db('Employeeattendance');
-    const { tmsId, date, timeIn, status, monthYear } = pendingChange.changeData;
-    
+    const { id, date, timeIn, status, monthYear } = pendingChange.changeData;
+
     await db.collection(monthYear).insertOne({
-      tmsId,
+      id,
       date,
       timeIn,
       status,
@@ -272,7 +272,7 @@ async function applyBulkUpload(client: any, pendingChange: any) {
 
       const formatCollectionName = (unitName: string) => unitName.trim().toUpperCase().replace(/\s+/g, '_');
       const dataByUnit = new Map();
-      
+
       fileData.forEach((row: any) => {
         const unitName = row['Unit Name'] || 'DEFAULT';
         const collectionName = formatCollectionName(unitName);
@@ -368,7 +368,7 @@ async function applyBulkUpload(client: any, pendingChange: any) {
         });
       } else {
         const unitExists = existingDoc.units?.some((u: any) => u.unit === unit);
-        
+
         if (!unitExists) {
           await collection.updateOne(
             { month },

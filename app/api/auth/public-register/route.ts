@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 // Public registration schema
 const publicRegisterSchema = z.object({
-  tmsId: z.string().min(1, 'ID is required'),
+  id: z.string().min(1, 'ID is required'),
   name: z.string().trim().min(1, 'Name is required'),
   password: z.string().min(1, 'Password is required'),
   email: z.string().email('Valid email is required'),
@@ -28,11 +28,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { tmsId, password, name, email, department } = validation.data;
+    const { id, password, name, email, department } = validation.data;
 
     // Additional password validation
     try {
-      await validateCredentials(tmsId, password);
+      await validateCredentials(id, password);
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const db = client.db("Users");
 
     // Check if user already exists
-    const existingUser = await db.collection('Admin').findOne({ tmsId });
+    const existingUser = await db.collection('Admin').findOne({ id });
     if (existingUser) {
       return NextResponse.json({ error: 'User ID already exists' }, { status: 409 });
     }
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 
     // Create new user with default HR role
     const newUser = {
-      tmsId,
+      id,
       password: hashedPassword,
       fullName: name,
       role: 'hr', // Default role for public registration
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
 
     // Return success without password
     const userResponse = {
-      tmsId: newUser.tmsId,
+      id: newUser.id,
       fullName: newUser.fullName,
       role: newUser.role,
       email: newUser.email,

@@ -22,20 +22,20 @@ export async function POST(request: Request) {
 
     const client = await clientPromise;
     const db = client.db("Users");
-    
+
     // Verify the requesting user is an admin or HR (HR cannot create admins)
-    const requestingUser = await db.collection('Admin').findOne({ tmsId: sessionData.tmsId });
+    const requestingUser = await db.collection('Admin').findOne({ id: sessionData.id });
     if (!requestingUser || (requestingUser.role !== 'admin' && requestingUser.role !== 'hr')) {
       return NextResponse.json({ error: 'Admin or HR access required' }, { status: 403 });
     }
 
     const body = await request.json();
-    
+
     // Validate the request body
     const validation = userSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
-        { 
+        {
           error: 'Validation failed',
           details: validation.error.errors.map(err => err.message)
         },
@@ -43,20 +43,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const { tmsId, password, name, role, email, department } = validation.data;
+    const { id, password, name, role, email, department } = validation.data;
     if (requestingUser.role === 'hr' && role === 'admin') {
       return NextResponse.json({ error: 'HR cannot create admin users' }, { status: 403 });
     }
 
     // Additional password validation
     try {
-      await validateCredentials(tmsId, password);
+      await validateCredentials(id, password);
     } catch (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     // Check if user already exists
-    const existingUser = await db.collection('Admin').findOne({ tmsId });
+    const existingUser = await db.collection('Admin').findOne({ id });
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 });
     }
@@ -66,14 +66,14 @@ export async function POST(request: Request) {
 
     // Create new user
     const newUser = {
-      tmsId,
+      id,
       password: hashedPassword,
       fullName: name,
       role,
       email: email || null,
       department: department || null,
       createdAt: new Date(),
-      createdBy: requestingUser.tmsId,
+      createdBy: requestingUser.id,
       passwordAttempts: 0,
       lockoutUntil: null
     };
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
     // Return success without password
     const userResponse = {
-      tmsId: newUser.tmsId,
+      id: newUser.id,
       fullName: newUser.fullName,
       role: newUser.role,
       email: newUser.email,
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
 
 
 

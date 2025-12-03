@@ -41,7 +41,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ tmsId: email, password }),
+        body: JSON.stringify({ id: email, password }),
         credentials: 'include'
       });
 
@@ -51,7 +51,7 @@ export default function LoginPage() {
         if (data.user) {
           try { localStorage.setItem('fullName', data.user.fullName || ''); } catch { }
           try { sessionStorage.setItem('fullName', data.user.fullName || ''); } catch { }
-          try { localStorage.setItem('tmsId', data.user.tmsId || ''); } catch { }
+          try { localStorage.setItem('id', data.user.id || ''); } catch { }
         }
 
         showSuccessToast('Login successful', { duration: 2000 });
@@ -113,7 +113,7 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tmsId: email,
+          id: email,
           name: fullName,
           email: emailAddress,
           password,
@@ -188,7 +188,7 @@ export default function LoginPage() {
                 {/* ID Input */}
                 <div className="space-y-1">
                   <input
-                    id="tmsId"
+                    id="id"
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value.toUpperCase())}
@@ -292,7 +292,7 @@ export default function LoginPage() {
                   <>
                     <div className="space-y-1">
                       <input
-                        id="tmsId"
+                        id="id"
                         type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value.toUpperCase())}
@@ -323,7 +323,7 @@ export default function LoginPage() {
                   <>
                     <div className="space-y-1">
                       <input
-                        id="tmsId"
+                        id="id"
                         type="text"
                         value={email}
                         className="w-full rounded-xl border border-zinc-800 bg-zinc-900/30 px-4 py-3 text-zinc-500 shadow-sm uppercase cursor-not-allowed text-sm"

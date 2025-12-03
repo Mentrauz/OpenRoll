@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     await connectDB();
 
     // Find user
-    const user = await User.findOne({ tmsId: body.tmsId });
+    const user = await User.findOne({ id: body.id });
 
     if (!user) {
       return NextResponse.json(
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     // Set auth cookie
     const cookieStore = await cookies();
-    cookieStore.set('auth-token', user.tmsId, {
+    cookieStore.set('auth-token', user.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       user: {
-        tmsId: user.tmsId,
+        id: user.id,
         name: user.name,
         role: user.role,
         email: user.email,

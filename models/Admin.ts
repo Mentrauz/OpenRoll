@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IAdmin extends Document {
-    tmsId: string;
+    id: string;
     password?: string;
     fullName: string;
     role: string;
@@ -11,7 +11,7 @@ export interface IAdmin extends Document {
 
 const AdminSchema: Schema = new Schema(
     {
-        tmsId: {
+        id: {
             type: String,
             required: true,
             unique: true, // Creates an index for fast lookup
@@ -37,7 +37,7 @@ const AdminSchema: Schema = new Schema(
 );
 
 // Ensure the index is created
-// AdminSchema.index({ tmsId: 1 }); // Removed to avoid duplicate index warning with unique: true
+// AdminSchema.index({ id: 1 }); // Removed to avoid duplicate index warning with unique: true
 
 // Prevent OverwriteModelError
 const Admin = mongoose.models.Admin || mongoose.model<IAdmin>('Admin', AdminSchema);

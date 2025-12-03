@@ -14,7 +14,7 @@ const excelDateToJSDate = (excelDate: number): Date => {
 // Helper function to safely format dates
 const formatDate = (dateValue: any): string => {
   if (!dateValue) return '';
-  
+
   try {
     // If it's a number (Excel date), convert it
     if (typeof dateValue === 'number' || !isNaN(Number(dateValue))) {
@@ -67,7 +67,7 @@ export async function GET(req: Request) {
 
     const client = await clientPromise;
     const db = client.db('Employees');
-    
+
     let query = {};
     if (search) {
       query = {
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
   try {
     const employeeData = await request.json();
     const { unitName, ...employeeDetails } = employeeData;
-    
+
     // Get user session
     let userRole: string | null = null;
     let createdBy: string | null = null;
@@ -118,10 +118,10 @@ export async function POST(request: Request) {
       const session = cookieStore.get('sessionUser');
       if (session?.value) {
         const parsed = JSON.parse(session.value);
-        createdBy = parsed?.tmsId || null;
+        createdBy = parsed?.id || null;
         userRole = parsed?.userRole || null;
       }
-    } catch {}
+    } catch { }
 
     // Format collection name to match exactly "JNS_INSTRUMENTS_LTD._(HK)" pattern
     const formattedUnit = unitName
@@ -134,7 +134,7 @@ export async function POST(request: Request) {
     // If user is NOT admin, store in pending changes
     if (userRole !== 'admin') {
       await connectDB();
-      
+
       const pendingChange = await PendingChange.create({
         changeType: 'employee_registration',
         status: 'pending',

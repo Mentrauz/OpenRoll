@@ -97,7 +97,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
 
         if (!userRole) {
           // Try fallback for TMS009 or default to admin
-          if (sessionData.isLoggedIn && sessionData.tmsId === 'TMS009') {
+          if (sessionData.isLoggedIn && sessionData.id === 'TMS009') {
             setIsAuthorized(true);
             setIsLoading(false);
             return;

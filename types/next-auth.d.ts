@@ -2,7 +2,7 @@ import { DefaultSession } from 'next-auth'
 
 interface UserSession {
   userId: string;
-  tmsId: string;
+  id: string;
   role: 'admin' | 'accounts' | 'data-operations' | 'supervisor' | 'hr';
   name: string;
 }

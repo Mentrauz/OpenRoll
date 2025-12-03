@@ -18,14 +18,14 @@ export default function RoleDisplay({ className = '', showDescription = false }:
       const sessionCookie = document.cookie
         .split('; ')
         .find(row => row.startsWith('sessionUser='));
-      
+
       if (sessionCookie) {
         const sessionData = JSON.parse(decodeURIComponent(sessionCookie.split('=')[1]));
         if (sessionData.userRole) {
           setUserRole(sessionData.userRole as UserRole);
         }
-        if (sessionData.tmsId) {
-          setUserName(sessionData.tmsId);
+        if (sessionData.id) {
+          setUserName(sessionData.id);
         }
       }
     } catch (error) {
@@ -76,13 +76,13 @@ export default function RoleDisplay({ className = '', showDescription = false }:
         {getRoleIcon(userRole)}
         <span>{getRoleDisplayName(userRole)}</span>
       </div>
-      
+
       {showDescription && (
         <div className="text-xs text-slate-600 max-w-md">
           {getRoleDescription(userRole)}
         </div>
       )}
-      
+
       {userName && (
         <span className="text-xs text-slate-600">
           ({userName})

@@ -155,7 +155,7 @@ export default function VoucherEntry({ voucherType, onBack }: VoucherEntryProps)
           .find(row => row.startsWith('sessionUser='));
         if (sessionCookie) {
           const sessionData = JSON.parse(decodeURIComponent(sessionCookie.split('=')[1]));
-          createdBy = sessionData.tmsId || 'System';
+          createdBy = sessionData.id || 'System';
         }
       } catch (error) {
         console.error('Error getting user session:', error);

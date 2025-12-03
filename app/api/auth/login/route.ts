@@ -6,17 +6,17 @@ import { verifyPassword } from '@/lib/auth/password-utils';
 
 export async function POST(request: Request) {
   try {
-    const { tmsId, password } = await request.json();
+    const { id, password } = await request.json();
 
     // Connect to the database using Mongoose (reuses connection)
     await connectDB();
 
     // Find user using the Mongoose model
-    // This ensures we use the schema which defines the index on tmsId
+    // This ensures we use the schema which defines the index on id
     // Note: We assume the MONGODB_URI includes the correct database name (e.g. /Users)
     // or that the 'Admin' collection is in the default database.
-    console.log(`Attempting login for tmsId: ${tmsId}`);
-    const user = await Admin.findOne({ tmsId });
+    console.log(`Attempting login for id: ${id}`);
+    const user = await Admin.findOne({ id });
     console.log(`User found: ${user ? 'Yes' : 'No'}`);
 
     if (!user) {
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     // If login is successful - ENSURE userRole is included
     const sessionData = {
-      tmsId: tmsId,
+      id: id,
       isLoggedIn: true,
       userRole: user.role || 'supervisor', // Ensure role is set; no implicit admin default
       timestamp: Date.now()
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         success: true,
         message: 'Login successful',
         user: {
-          tmsId: user.tmsId,
+          id: user.id,
           fullName: user.fullName,
           role: user.role || 'supervisor'
         }

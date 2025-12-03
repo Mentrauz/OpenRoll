@@ -11,14 +11,14 @@ export async function GET(request: Request) {
     // Get session to check permissions
     const cookieStore = await cookies();
     const session = cookieStore.get('sessionUser');
-    
+
     if (!session?.value) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const sessionData = JSON.parse(session.value);
     const userRole = sessionData.userRole;
-    const tmsId = sessionData.tmsId;
+    const id = sessionData.id;
 
     await connectDB();
 
@@ -29,12 +29,12 @@ export async function GET(request: Request) {
 
     // Build query
     let query: any = {};
-    
+
     // Non-admins can only see their own pending changes
     if (userRole !== 'admin') {
-      query.requestedBy = tmsId;
+      query.requestedBy = id;
     } else if (onlyMine) {
-      query.requestedBy = tmsId;
+      query.requestedBy = id;
     }
 
     if (status) {
@@ -82,13 +82,13 @@ export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('sessionUser');
-    
+
     if (!session?.value) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const sessionData = JSON.parse(session.value);
-    
+
     await connectDB();
 
     const body = await request.json();
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     const pendingChange = await PendingChange.create({
       changeType,
       status: 'pending',
-      requestedBy: sessionData.tmsId,
+      requestedBy: sessionData.id,
       requestedByRole: sessionData.userRole || 'data-operations',
       requestedAt: new Date(),
       changeData,
