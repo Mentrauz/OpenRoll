@@ -1,6 +1,6 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, startTransition } from 'react';
 import React from 'react';
 import { useTheme } from 'next-themes';
 import {
@@ -186,6 +186,40 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
+  // Prefetch heavy routes so page switches stay client-side and feel instant
+  useEffect(() => {
+    const routesToPrefetch = [
+      '/salary-reports',
+      '/invoice',
+      '/dashboard',
+      '/attendance',
+      '/bulk-uploads',
+      '/unit-registration',
+      '/employee-registration',
+      '/unit-updation',
+      '/employee-updation',
+      '/active-employees',
+      '/esic-export',
+      '/epf-export',
+      '/lwf-export',
+      '/pf-esi-export',
+      '/pending-approvals',
+      '/account-settings',
+    ];
+
+    routesToPrefetch.forEach((path) => {
+      // useRouter in the App Router does not expose prefetch; guard to avoid runtime errors
+      const prefetchFn = (router as any)?.prefetch;
+      if (typeof prefetchFn === 'function') {
+        try {
+          prefetchFn(path);
+        } catch {
+          // ignore prefetch errors
+        }
+      }
+    });
+  }, [router]);
+
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
@@ -329,16 +363,31 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
     }
   }, []);
 
+  const prefetchRoute = useCallback((href: string) => {
+    if (!href || href === '#') return;
+    const prefetchFn = (router as any)?.prefetch;
+    if (typeof prefetchFn === 'function') {
+      try {
+        prefetchFn(href);
+      } catch {
+        // ignore prefetch errors
+      }
+    }
+  }, [router]);
+
   const navigateTo = useCallback((href: string) => {
     // Always allow navigation/animation trigger, even for same page
+    prefetchRoute(href);
     // Use router.push for client-side navigation (not async)
-    router.push(href);
+    startTransition(() => {
+      router.push(href);
+    });
 
     // Close mobile sidebar when navigating
     setIsMobileSidebarOpen(false);
 
     if (onNavigate) onNavigate(href);
-  }, [pathname, router, onNavigate]);
+  }, [prefetchRoute, router, onNavigate]);
 
   // Filter menu items based on user permissions
   const filteredMenuItems = useMemo(() => {
@@ -583,7 +632,10 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                             navigateTo(item.href);
                           }
                         }}
-                        onMouseEnter={() => getIconRef(item.name).current?.playAnimation()}
+                        onMouseEnter={() => {
+                          prefetchRoute(item.href);
+                          getIconRef(item.name).current?.playAnimation();
+                        }}
                         onMouseLeave={() => getIconRef(item.name).current?.goToFirstFrame()}
                         className={`relative w-full flex items-center gap-3 px-4 py-2.5 pr-10 rounded-lg text-sm ${isActive || anyChildActive
                           ? 'text-gray-900 dark:text-white font-medium'
@@ -609,7 +661,10 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                             <button
                               key={child.name}
                               onClick={() => navigateTo(child.href)}
-                              onMouseEnter={() => getIconRef(child.name).current?.playAnimation()}
+                              onMouseEnter={() => {
+                                prefetchRoute(child.href);
+                                getIconRef(child.name).current?.playAnimation();
+                              }}
                               onMouseLeave={() => getIconRef(child.name).current?.goToFirstFrame()}
                               className={`w-full text-left px-4 py-2 rounded-lg text-sm flex items-center gap-3 ${pathname === child.href
                                 ? 'text-gray-900 dark:text-white font-medium'
@@ -644,7 +699,10 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                             navigateTo(item.href);
                           }
                         }}
-                        onMouseEnter={() => getIconRef(item.name).current?.playAnimation()}
+                        onMouseEnter={() => {
+                          prefetchRoute(item.href);
+                          getIconRef(item.name).current?.playAnimation();
+                        }}
                         onMouseLeave={() => getIconRef(item.name).current?.goToFirstFrame()}
                         className={`relative w-full flex items-center gap-3 px-4 py-2.5 pr-10 rounded-lg text-sm ${isActive || anyChildActive
                           ? 'text-gray-900 dark:text-white font-medium'
@@ -669,7 +727,10 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                             <button
                               key={child.name}
                               onClick={() => navigateTo(child.href)}
-                              onMouseEnter={() => getIconRef(child.name).current?.playAnimation()}
+                              onMouseEnter={() => {
+                                prefetchRoute(child.href);
+                                getIconRef(child.name).current?.playAnimation();
+                              }}
                               onMouseLeave={() => getIconRef(child.name).current?.goToFirstFrame()}
                               className={`w-full text-left px-4 py-2 rounded-lg text-sm flex items-center gap-3 ${pathname === child.href
                                 ? 'text-gray-900 dark:text-white font-medium'
@@ -717,7 +778,10 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                           navigateTo(item.href);
                         }
                       }}
-                      onMouseEnter={() => getIconRef(item.name).current?.playAnimation()}
+                      onMouseEnter={() => {
+                        prefetchRoute(item.href);
+                        getIconRef(item.name).current?.playAnimation();
+                      }}
                       onMouseLeave={() => getIconRef(item.name).current?.goToFirstFrame()}
                       disabled={isLoggingOut && item.name === 'Logout'}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm relative ${isActive
