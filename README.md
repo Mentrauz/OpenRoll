@@ -89,8 +89,9 @@ A comprehensive payroll management solution built with Next.js, designed to stre
 payroll-uid/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/             # Authentication pages
-│   ├── (dashboard)/        # Dashboard and reports
-│   ├── (main)/             # Main application pages (route groups keep URLs stable)
+│   ├── (main)/             # Main application pages (shared shell/layout)
+│   │   ├── dashboard/      # Dashboard (now in main for smooth navigation)
+│   │   ├── salary-reports/ # Salary reports (shares shell with main)
 │   │   ├── (attendance)/   # Attendance and employee attendance UI
 │   │   ├── (employees)/    # Employee registration/updation/active employees
 │   │   ├── (payroll)/      # Payroll exports (PF/ESI/LWF/EPF)
@@ -99,9 +100,18 @@ payroll-uid/
 │   │   ├── (books)/        # Accounting/books pages + components
 │   │   ├── (invoices)/     # Invoice generation
 │   │   ├── (approvals)/    # Pending approvals
-│   │   └── (settings)/     # Account settings
+│   │   ├── (settings)/     # Account settings
+│   │   ├── error.tsx       # Main group error boundary
+│   │   ├── loading.tsx     # Main group loading UI
+│   │   └── layout.tsx      # Main group layout (includes Sidebar/RouteGuard)
 │   ├── api/                # API endpoints
-│   └── globals.css         # Global styles
+│   ├── components/         # App-level components
+│   ├── data/               # Static data
+│   ├── globals.css         # Global styles
+│   ├── layout.tsx          # Root layout
+│   ├── not-found.tsx       # 404 page
+│   ├── page.tsx            # Landing page
+│   └── providers.tsx       # Root providers
 ├── components/            # Reusable UI components
 ├── lib/                   # Utility functions and configurations
 ├── models/                # MongoDB schemas
