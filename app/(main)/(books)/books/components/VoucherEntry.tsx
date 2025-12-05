@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Plus, Trash2, Save, Receipt } from 'lucide-react';
-import LordIcon from '../../../../components/ui/LordIcon';
+import LordIcon from '../../../../../components/ui/LordIcon';
 import searchIcon from '../../../../../public/icons/search.json';
 import { toast } from 'react-hot-toast';
 import ModernDatePicker from '@/components/ModernDatePicker';

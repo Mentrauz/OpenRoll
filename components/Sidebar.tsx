@@ -404,7 +404,6 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
 
   // Keep parents open for active route, but allow user to collapse manually
   useEffect(() => {
-    const defaults = ['main-menu', 'general'];
     const parents: string[] = [];
 
     const collectParents = (items: MenuItem[]) => {
@@ -419,9 +418,6 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
     collectParents(filteredMenuItems.apps);
 
     const next = new Set<string>();
-
-    // Defaults always expanded
-    defaults.forEach(name => next.add(name));
 
     // Keep existing expanded unless user collapsed it
     expandedMenus.forEach(name => {
@@ -560,10 +556,12 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
           <div className="mb-6">
             <button
               onClick={() => toggleSubmenu('main-menu')}
-              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-slate-600 dark:hover:text-slate-400"
+              className="relative w-full flex items-center justify-between px-3 py-2 pr-10 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-slate-600 dark:hover:text-slate-400"
             >
-              Main Menu
-              <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes('main-menu') ? 'rotate-180' : ''}`} />
+              <span>Main Menu</span>
+              <span className="absolute right-3 flex items-center">
+                <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes('main-menu') ? 'rotate-180' : ''}`} />
+              </span>
             </button>
 
             {expandedMenus.includes('main-menu') && (
@@ -587,7 +585,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                         }}
                         onMouseEnter={() => getIconRef(item.name).current?.playAnimation()}
                         onMouseLeave={() => getIconRef(item.name).current?.goToFirstFrame()}
-                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm relative ${isActive || anyChildActive
+                        className={`relative w-full flex items-center gap-3 px-4 py-2.5 pr-10 rounded-lg text-sm ${isActive || anyChildActive
                           ? 'text-gray-900 dark:text-white font-medium'
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                           }`}
@@ -598,7 +596,9 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                         {renderIcon(item.icon, { className: 'w-5 h-5 flex-shrink-0', trigger: 'hover', size: 20 }, item.name, getIconRef(item.name))}
                         <span className="flex-1 text-left">{item.name}</span>
                         {hasChildren && (
-                          <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes(item.name) ? 'rotate-180' : ''}`} />
+                          <span className="absolute right-3 flex items-center">
+                            <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes(item.name) ? 'rotate-180' : ''}`} />
+                          </span>
                         )}
                       </button>
 
@@ -646,7 +646,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                         }}
                         onMouseEnter={() => getIconRef(item.name).current?.playAnimation()}
                         onMouseLeave={() => getIconRef(item.name).current?.goToFirstFrame()}
-                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm relative ${isActive || anyChildActive
+                        className={`relative w-full flex items-center gap-3 px-4 py-2.5 pr-10 rounded-lg text-sm ${isActive || anyChildActive
                           ? 'text-gray-900 dark:text-white font-medium'
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                           }`}
@@ -657,7 +657,9 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
                         {renderIcon(item.icon, { className: 'w-5 h-5 flex-shrink-0', trigger: 'hover', size: 20 }, item.name, getIconRef(item.name))}
                         <span className="flex-1 text-left">{item.name}</span>
                         {hasChildren && (
-                          <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes(item.name) ? 'rotate-180' : ''}`} />
+                          <span className="absolute right-3 flex items-center">
+                            <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes(item.name) ? 'rotate-180' : ''}`} />
+                          </span>
                         )}
                       </button>
 
@@ -692,10 +694,12 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
           <div className="mb-6">
             <button
               onClick={() => toggleSubmenu('general')}
-              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-slate-600 dark:hover:text-slate-400"
+              className="relative w-full flex items-center justify-between px-3 py-2 pr-10 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-slate-600 dark:hover:text-slate-400"
             >
-              General
-              <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes('general') ? 'rotate-180' : ''}`} />
+              <span>General</span>
+              <span className="absolute right-3 flex items-center">
+                <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.includes('general') ? 'rotate-180' : ''}`} />
+              </span>
             </button>
 
             {expandedMenus.includes('general') && (

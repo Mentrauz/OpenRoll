@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit2, Trash2, X, Check, Building2, ArrowLeft } from 'lucide-react';
-import LordIcon, { LordIconRef } from '../../../../components/ui/LordIcon';
+import LordIcon, { LordIconRef } from '../../../../../components/ui/LordIcon';
 import searchIcon from '../../../../../public/icons/search.json';
 import { toast } from 'react-hot-toast';
 import AnimatedSelect from '@/components/AnimatedSelect';
