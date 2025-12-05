@@ -141,7 +141,7 @@ export const AnimatedSelect: React.FC<AnimatedSelectProps> = ({
               direction === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'
             } bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden ${dropdownClassName}`}
           >
-            <div className="py-1 max-h-60 overflow-y-auto">
+            <div className="py-1 max-h-60 overflow-y-auto custom-scrollbar pr-1">
               {options.map((option) => (
                 <button
                   key={option.value}

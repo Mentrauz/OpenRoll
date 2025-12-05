@@ -5,6 +5,7 @@ if (!process.env.MONGODB_URI) {
 }
 
 const MONGODB_URI = process.env.MONGODB_URI;
+const DEFAULT_DB_NAME = process.env.MONGODB_DB || 'Users';
 
 let cached = global.mongoose;
 
@@ -24,7 +25,7 @@ async function connectDB() {
       serverSelectionTimeoutMS: 15000, // Increased to 15 seconds
       socketTimeoutMS: 45000,
       connectTimeoutMS: 15000, // Added connection timeout
-      dbName: 'Users', // Explicitly connect to the Users database
+      dbName: DEFAULT_DB_NAME,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {

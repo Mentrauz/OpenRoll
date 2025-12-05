@@ -88,11 +88,20 @@ A comprehensive payroll management solution built with Next.js, designed to stre
 ```
 payroll-uid/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
-│   ├── (dashboard)/       # Dashboard and reports
-│   ├── (main)/            # Main application pages
-│   ├── api/               # API endpoints
-│   └── globals.css        # Global styles
+│   ├── (auth)/             # Authentication pages
+│   ├── (dashboard)/        # Dashboard and reports
+│   ├── (main)/             # Main application pages (route groups keep URLs stable)
+│   │   ├── (attendance)/   # Attendance and employee attendance UI
+│   │   ├── (employees)/    # Employee registration/updation/active employees
+│   │   ├── (payroll)/      # Payroll exports (PF/ESI/LWF/EPF)
+│   │   ├── (exports)/      # Bulk uploads and data pipelines
+│   │   ├── (units)/        # Unit registration and updation
+│   │   ├── (books)/        # Accounting/books pages + components
+│   │   ├── (invoices)/     # Invoice generation
+│   │   ├── (approvals)/    # Pending approvals
+│   │   └── (settings)/     # Account settings
+│   ├── api/                # API endpoints
+│   └── globals.css         # Global styles
 ├── components/            # Reusable UI components
 ├── lib/                   # Utility functions and configurations
 ├── models/                # MongoDB schemas

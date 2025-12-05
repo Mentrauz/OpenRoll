@@ -165,6 +165,7 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['main-menu', 'general']); // Default sections open
+  const [manuallyCollapsed, setManuallyCollapsed] = useState<string[]>([]);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [roleConfig, setRoleConfig] = useState<{ menuPermissions?: Record<string, UserRole[]> } | null>(null);
   const [permissionsVersion, setPermissionsVersion] = useState(0);
@@ -401,6 +402,48 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
     return filtered;
   }, [userRole, handleLogout, roleConfig]);
 
+  // Keep parents open for active route, but allow user to collapse manually
+  useEffect(() => {
+    const defaults = ['main-menu', 'general'];
+    const parents: string[] = [];
+
+    const collectParents = (items: MenuItem[]) => {
+      items.forEach(item => {
+        if (item.children?.some(child => child.href === pathname)) {
+          parents.push(item.name);
+        }
+      });
+    };
+
+    collectParents(filteredMenuItems.home);
+    collectParents(filteredMenuItems.apps);
+
+    const next = new Set<string>();
+
+    // Defaults always expanded
+    defaults.forEach(name => next.add(name));
+
+    // Keep existing expanded unless user collapsed it
+    expandedMenus.forEach(name => {
+      if (!manuallyCollapsed.includes(name)) next.add(name);
+    });
+
+    // Auto-open parents for active route unless manually collapsed
+    parents.forEach(name => {
+      if (!manuallyCollapsed.includes(name)) next.add(name);
+    });
+
+    const nextExpanded = Array.from(next);
+
+    const changed =
+      nextExpanded.length !== expandedMenus.length ||
+      nextExpanded.some(name => !expandedMenus.includes(name));
+
+    if (changed) {
+      setExpandedMenus(nextExpanded);
+    }
+  }, [pathname, filteredMenuItems.home, filteredMenuItems.apps, expandedMenus, manuallyCollapsed]);
+
   // Get user initials from full name
   const getUserInitials = useCallback((fullName?: string): string => {
     if (!fullName) return 'U';
@@ -460,39 +503,19 @@ export default function Sidebar({ onNavigate }: SidebarProps = {}) {
     }
   }, []);
 
-  // Toggle submenu expansion
+  // Toggle submenu expansion (explicit user intent)
   const toggleSubmenu = useCallback((menuName: string) => {
-    setExpandedMenus(prev =>
-      prev.includes(menuName) ? prev.filter(name => name !== menuName) : [...prev, menuName]
-    );
-  }, []);
-
-  // Enhanced click outside handling for submenus
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      // Only close submenu items, keep main sections (main-menu and general) open
-      if (target && !target.closest('aside')) {
-        setExpandedMenus(prev => prev.filter(name => name === 'main-menu' || name === 'general'));
+    setExpandedMenus(prev => {
+      if (prev.includes(menuName)) {
+        // Collapse and remember user's choice
+        setManuallyCollapsed(mc => (mc.includes(menuName) ? mc : [...mc, menuName]));
+        return prev.filter(name => name !== menuName);
       }
-    };
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        // Only close submenu items, keep main sections open
-        setExpandedMenus(prev => prev.filter(name => name === 'main-menu' || name === 'general'));
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
+      // Expand and clear manual collapse
+      setManuallyCollapsed(mc => mc.filter(name => name !== menuName));
+      return [...prev, menuName];
+    });
   }, []);
-
 
   return (
     <>

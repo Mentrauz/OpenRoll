@@ -5,7 +5,6 @@ import { Toaster } from 'react-hot-toast'
 import Layout from '@/components/Layout'
 import { Providers } from './providers'
 import PWAInstall from '@/components/PWAInstall'
-import { DropdownProvider } from '@/components/AnimatedSelect'
 import UnloadCleanup from '@/components/UnloadCleanup'
 import ProductionConsoleSilencer from '@/components/ProductionConsoleSilencer'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.svg',
-    apple: '/logo.png',
+    apple: '/favicon.svg',
   },
 }
 
@@ -46,11 +45,8 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <link rel="icon" href="/logo.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+        <link rel="icon" href="/favicon.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Payroll System" />
@@ -66,14 +62,12 @@ export default function RootLayout({
           <ProductionConsoleSilencer />
           <UnloadCleanup />
           <PWAInstall />
-          <DropdownProvider>
-            <Toaster position="bottom-center" />
-            <Providers>
-              <Layout>
-                {children}
-              </Layout>
-            </Providers>
-          </DropdownProvider>
+          <Toaster position="bottom-center" />
+          <Providers>
+            <Layout>
+              {children}
+            </Layout>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

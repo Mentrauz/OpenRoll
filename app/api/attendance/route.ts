@@ -132,13 +132,30 @@ export async function POST(request: Request) {
     // Explicitly connect to Employeeattendance database
     const db = client.db('Employeeattendance');
 
-    // Check if already marked
-    const existing = await db.collection(collectionName).findOne({
-      id: id,
-      date: currentDate.toISOString().split('T')[0]
-    });
+    const dateString = currentDate.toISOString().split('T')[0];
 
-    if (existing) {
+    // Prepare attendance record with location
+    const attendanceRecord = {
+      id: id,
+      date: dateString,
+      timeIn: currentDate.toISOString(),
+      status: 'present',
+      createdAt: currentDate.toISOString(),
+      location: location ? {  // Only add location if provided
+        latitude: location.latitude,
+        longitude: location.longitude,
+        accuracy: location.accuracy
+      } : undefined
+    };
+
+    // Upsert to avoid duplicates in concurrent/rapid submissions
+    const result = await db.collection(collectionName).updateOne(
+      { id, date: dateString },
+      { $setOnInsert: attendanceRecord },
+      { upsert: true }
+    );
+
+    if (result.upsertedCount === 0) {
       return NextResponse.json({
         success: false,
         error: 'Already marked attendance for today'
@@ -150,23 +167,6 @@ export async function POST(request: Request) {
         }
       });
     }
-
-    // Prepare attendance record with location
-    const attendanceRecord = {
-      id: id,
-      date: currentDate.toISOString().split('T')[0],
-      timeIn: currentDate.toISOString(),
-      status: 'present',
-      createdAt: currentDate.toISOString(),
-      location: location ? {  // Only add location if provided
-        latitude: location.latitude,
-        longitude: location.longitude,
-        accuracy: location.accuracy
-      } : undefined
-    };
-
-    // Mark attendance
-    const result = await db.collection(collectionName).insertOne(attendanceRecord);
 
     return NextResponse.json({
       success: true,
