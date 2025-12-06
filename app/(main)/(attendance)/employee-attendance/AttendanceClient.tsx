@@ -379,7 +379,8 @@ export default function AttendanceClient() {
 
   const checkTodayAttendance = async (id: string) => {
     try {
-      const response = await fetch(`/api/attendance/check?id=${id}`);
+      const todayString = formatDateForAPI(new Date());
+      const response = await fetch(`/api/attendance/check?id=${id}&date=${todayString}`);
       const data = await response.json();
       setHasMarkedToday(data.hasMarkedToday);
     } catch (error) {
@@ -411,49 +412,27 @@ export default function AttendanceClient() {
     }
 
     try {
-      // First get location
-      if (!navigator.geolocation) {
-        toast.error('Geolocation is not supported by your browser');
-        return;
+      const now = new Date();
+      const clientDate = formatDateForAPI(now);
+      const clientTimestamp = now.toISOString();
+
+      const response = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, clientDate, clientTimestamp }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Attendance marked successfully!');
+        setHasMarkedToday(true);
+        await fetchAttendanceHistory(id, startDate, endDate);
+      } else {
+        toast.error(data.error || 'Failed to mark attendance');
       }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          // Got location, now mark attendance
-          const response = await fetch('/api/attendance', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              id: id,
-              location: {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy
-              }
-            })
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            toast.success('Attendance marked successfully!');
-            setHasMarkedToday(true);
-            await fetchAttendanceHistory(id, startDate, endDate);
-          } else {
-            toast.error(data.error || 'Failed to mark attendance');
-          }
-        },
-        (error) => {
-          toast.error('Please enable location access to mark attendance');
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
     } catch (error) {
       toast.error('Failed to mark attendance');
     }
@@ -881,27 +860,28 @@ export default function AttendanceClient() {
 
       if (data && data.address) {
         const address = data.address;
-        let locationName = '';
+        let mainPart = '';
 
         // Try to build a readable location name from address components
-        // Priority: city/town > suburb > county > state > country
+        // Priority: city/town > suburb > county > state
         if (address.city) {
-          locationName = address.city;
+          mainPart = address.city;
         } else if (address.town) {
-          locationName = address.town;
+          mainPart = address.town;
         } else if (address.village) {
-          locationName = address.village;
+          mainPart = address.village;
         } else if (address.suburb) {
-          locationName = address.suburb;
+          mainPart = address.suburb;
         } else if (address.county) {
-          locationName = address.county;
+          mainPart = address.county;
         } else if (address.state) {
-          locationName = address.state;
-        } else if (address.country) {
-          locationName = address.country;
+          mainPart = address.state;
         }
 
-        // If we got a location name, use it; otherwise use display_name (truncated)
+        const country = address.country || '';
+        let locationName = mainPart ? `${mainPart}${country ? `, ${country}` : ''}` : country;
+
+        // If we got nothing, use display_name (truncated)
         if (!locationName && data.display_name) {
           locationName = data.display_name.split(',')[0] || 'Unknown Location';
         }

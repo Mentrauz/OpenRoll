@@ -107,7 +107,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { id, location } = body;
+    const { id, location, clientDate, clientTimestamp } = body;
 
     if (!id) {
       return NextResponse.json({
@@ -124,21 +124,31 @@ export async function POST(request: Request) {
     }
 
     const currentDate = new Date();
-    const month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
+    const providedDate = typeof clientDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(clientDate)
+      ? clientDate
+      : null;
+
+    const dateForRecord = providedDate || currentDate.toISOString().split('T')[0];
+
+    const [yearStr, monthStr] = dateForRecord.split('-');
+    const month = Number(monthStr);
+    const year = Number(yearStr);
     const collectionName = `${getMonthName(month)}_${year}`;
 
     const client = await clientPromise;
     // Explicitly connect to Employeeattendance database
     const db = client.db('Employeeattendance');
 
-    const dateString = currentDate.toISOString().split('T')[0];
+    const dateString = dateForRecord;
+    const timeInValue = typeof clientTimestamp === 'string' && clientTimestamp
+      ? clientTimestamp
+      : currentDate.toISOString();
 
     // Prepare attendance record with location
     const attendanceRecord = {
       id: id,
       date: dateString,
-      timeIn: currentDate.toISOString(),
+      timeIn: timeInValue,
       status: 'present',
       createdAt: currentDate.toISOString(),
       location: location ? {  // Only add location if provided

@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const clientDate = searchParams.get('date');
 
     if (!id) {
       return NextResponse.json({
@@ -17,9 +18,13 @@ export async function GET(request: Request) {
     // Explicitly connect to Employeeattendance database
     const db = defaultDb.client.db('Employeeattendance');
 
-    const today = new Date().toISOString().split('T')[0];
-    const month = new Date().getMonth() + 1;
-    const year = new Date().getFullYear();
+    const today = (clientDate && /^\d{4}-\d{2}-\d{2}$/.test(clientDate))
+      ? clientDate
+      : new Date().toISOString().split('T')[0];
+
+    const [yearStr, monthStr] = today.split('-');
+    const month = Number(monthStr);
+    const year = Number(yearStr);
     const collectionName = `${getMonthName(month)}_${year}`;
 
     const attendance = await db.collection(collectionName).findOne({

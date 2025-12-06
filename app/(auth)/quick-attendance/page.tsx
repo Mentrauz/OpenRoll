@@ -20,66 +20,46 @@ export default function QuickAttendancePage() {
     setIsSubmitting(true);
 
     try {
-      // First get location
-      if (!navigator.geolocation) {
-        toast.error('Geolocation is not supported by your browser');
-        return;
+      const now = new Date();
+      const clientDate = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0')
+      ].join('-');
+
+      const response = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id.trim(),
+          clientDate,
+          clientTimestamp: now.toISOString(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Attendance marked successfully!', {
+          position: 'bottom-center',
+          duration: 2000,
+          style: {
+            marginBottom: '80px',
+            background: '#4B0082',
+            color: '#fff',
+          },
+        });
+        setId('');
+      } else {
+        toast.error(data.error || 'Failed to mark attendance', {
+          position: 'bottom-center',
+          style: {
+            marginBottom: '80px',
+          },
+        });
       }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          // Got location, now submit attendance
-          const response = await fetch('/api/attendance', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              id: id.trim(),
-              location: {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy
-              }
-            }),
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            toast.success('Attendance marked successfully!', {
-              position: 'bottom-center',
-              duration: 2000,
-              style: {
-                marginBottom: '80px',
-                background: '#4B0082',
-                color: '#fff',
-              },
-            });
-            setId('');
-          } else {
-            toast.error(data.error || 'Failed to mark attendance', {
-              position: 'bottom-center',
-              style: {
-                marginBottom: '80px',
-              },
-            });
-          }
-        },
-        (error) => {
-          toast.error('Please enable location access to mark attendance', {
-            position: 'bottom-center',
-            style: {
-              marginBottom: '80px',
-            },
-          });
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        }
-      );
     } catch (error) {
       toast.error('Failed to mark attendance');
     } finally {
