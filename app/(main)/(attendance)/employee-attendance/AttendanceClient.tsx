@@ -122,7 +122,7 @@ export default function AttendanceClient() {
             const name = await getLocationName(record.location!.latitude, record.location!.longitude);
             setLocationName(name);
           } catch (error) {
-            setLocationName('Location unavailable');
+            setLocationName('Country unavailable');
           } finally {
             setIsLoading(false);
           }
@@ -132,7 +132,11 @@ export default function AttendanceClient() {
     }, [record.location]);
 
     if (!record.location) {
-      return <div className="text-sm text-gray-500 dark:text-gray-400">Location not available</div>;
+      return (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {locationName || 'Country not captured'}
+        </div>
+      );
     }
 
     if (isLoading) {
@@ -362,13 +366,13 @@ export default function AttendanceClient() {
     fetchPermissions();
   }, []);
 
-  // Auto-select today's date when the page loads
+  // Auto-select today's date when the page loads so the list shows today's data
   useEffect(() => {
-    if (!isLoading && userData && canViewAllAttendance() && selectedCalendarBarDate === null) {
+    if (!isLoading && selectedCalendarBarDate === null) {
       const today = new Date();
       handleCalendarBarDateSelect(today);
     }
-  }, [isLoading, userData, permissionsConfig]);
+  }, [isLoading, selectedCalendarBarDate]);
 
   // Refetch attendance history when date range changes
   useEffect(() => {
@@ -404,6 +408,33 @@ export default function AttendanceClient() {
     }
   };
 
+  const getClientLocation = useCallback(async (): Promise<AttendanceRecord['location'] | null> => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      return null;
+    }
+
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: typeof position.coords.accuracy === 'number' ? position.coords.accuracy : 0
+          });
+        },
+        (error) => {
+          console.warn('Unable to capture geolocation for attendance:', error);
+          resolve(null);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    });
+  }, []);
+
   const markAttendance = async () => {
     const id = localStorage.getItem('id');
     if (!id) {
@@ -415,13 +446,14 @@ export default function AttendanceClient() {
       const now = new Date();
       const clientDate = formatDateForAPI(now);
       const clientTimestamp = now.toISOString();
+      const location = await getClientLocation();
 
       const response = await fetch('/api/attendance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id, clientDate, clientTimestamp }),
+        body: JSON.stringify({ id, clientDate, clientTimestamp, location: location || undefined }),
       });
 
       const data = await response.json();
@@ -860,31 +892,22 @@ export default function AttendanceClient() {
 
       if (data && data.address) {
         const address = data.address;
-        let mainPart = '';
-
-        // Try to build a readable location name from address components
-        // Priority: city/town > suburb > county > state
-        if (address.city) {
-          mainPart = address.city;
-        } else if (address.town) {
-          mainPart = address.town;
-        } else if (address.village) {
-          mainPart = address.village;
-        } else if (address.suburb) {
-          mainPart = address.suburb;
-        } else if (address.county) {
-          mainPart = address.county;
-        } else if (address.state) {
-          mainPart = address.state;
-        }
-
         const country = address.country || '';
-        let locationName = mainPart ? `${mainPart}${country ? `, ${country}` : ''}` : country;
+        const locality =
+          address.city ||
+          address.town ||
+          address.village ||
+          address.suburb ||
+          address.county ||
+          address.state ||
+          '';
 
-        // If we got nothing, use display_name (truncated)
-        if (!locationName && data.display_name) {
-          locationName = data.display_name.split(',')[0] || 'Unknown Location';
-        }
+        // Prefer country so we always show where attendance was marked
+        let locationName =
+          country ||
+          locality ||
+          (data.display_name ? data.display_name.split(',').pop()?.trim() : '') ||
+          'Unknown country';
 
         // Cache the result
         setLocationNames(prev => new Map(prev).set(key, locationName));
@@ -894,7 +917,7 @@ export default function AttendanceClient() {
       }
     } catch (error) {
       console.warn('Failed to get location name:', error);
-      const fallbackName = 'Location unavailable';
+      const fallbackName = 'Country unavailable';
       setLocationNames(prev => new Map(prev).set(key, fallbackName));
       return fallbackName;
     } finally {
