@@ -60,7 +60,6 @@ export default function AccountSettings() {
     'epf-export': ['/epf-export'],
     'lwf-export': ['/lwf-export'],
     'pf-esi-export': ['/pf-esi-export'],
-    books: ['/books'],
     'account-settings': ['/account-settings'],
     'pending-approvals': ['/pending-approvals']
   };

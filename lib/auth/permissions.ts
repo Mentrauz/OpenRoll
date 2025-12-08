@@ -28,9 +28,6 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   '/lwf-export': ['admin', 'accounts', 'hr'],
   '/pf-esi-export': ['admin', 'accounts', 'hr'],
   
-  // Books - accessible to admin, accounts, and hr
-  '/books': ['admin', 'accounts', 'hr'],
-
   // Settings - accessible to all authenticated users
   '/account-settings': ['admin', 'accounts', 'data-operations', 'supervisor', 'hr'],
   
@@ -59,7 +56,6 @@ export const MENU_PERMISSIONS: Record<string, UserRole[]> = {
   'epf-export': ['admin', 'accounts', 'hr'],
   'lwf-export': ['admin', 'accounts', 'hr'],
   'pf-esi-export': ['admin', 'accounts', 'hr'],
-  books: ['admin', 'accounts', 'hr'],
   'account-settings': ['admin', 'accounts', 'data-operations', 'supervisor', 'hr'],
   'pending-approvals': ['admin'],
 };

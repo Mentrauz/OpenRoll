@@ -113,21 +113,36 @@ export default function AttendanceClient() {
   const LocationNameDisplay = ({ record }: { record: AttendanceRecord }) => {
     const [locationName, setLocationName] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+    const currentLocationKeyRef = useRef<string | null>(null);
 
     useEffect(() => {
       if (record.location) {
+        const key = `${record.location.latitude.toFixed(6)},${record.location.longitude.toFixed(6)}`;
+        currentLocationKeyRef.current = key;
         const fetchLocationName = async () => {
           setIsLoading(true);
+          let isActive = true;
           try {
             const name = await getLocationName(record.location!.latitude, record.location!.longitude);
-            setLocationName(name);
+            if (isActive && currentLocationKeyRef.current === key) {
+              setLocationName(name);
+            }
           } catch (error) {
-            setLocationName('Country unavailable');
+            if (isActive && currentLocationKeyRef.current === key) {
+              setLocationName('Country unavailable');
+            }
           } finally {
-            setIsLoading(false);
+            if (isActive && currentLocationKeyRef.current === key) {
+              setIsLoading(false);
+            }
           }
         };
         fetchLocationName();
+
+        return () => {
+          // Prevent stale fetches from updating state
+          currentLocationKeyRef.current = null;
+        };
       }
     }, [record.location]);
 

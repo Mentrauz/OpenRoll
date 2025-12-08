@@ -50,7 +50,6 @@ export async function GET() {
         '/epf-export': ['exports', 'epf-export'],
         '/lwf-export': ['exports', 'lwf-export'],
         '/pf-esi-export': ['exports', 'pf-esi-export'],
-        '/books': ['books'],
         '/account-settings': ['account-settings'],
         '/pending-approvals': ['pending-approvals']
       };
@@ -202,7 +201,6 @@ export async function POST() {
       '/epf-export': ['admin', 'accounts', 'hr'],
       '/lwf-export': ['admin', 'accounts', 'hr'],
       '/pf-esi-export': ['admin', 'accounts', 'hr'],
-      '/books': ['admin', 'accounts', 'hr'],
       '/account-settings': ['admin', 'accounts', 'data-operations', 'supervisor', 'hr'],
       '/pending-approvals': ['admin']
     };
@@ -227,7 +225,6 @@ export async function POST() {
       'epf-export': ['admin', 'accounts', 'hr'],
       'lwf-export': ['admin', 'accounts', 'hr'],
       'pf-esi-export': ['admin', 'accounts', 'hr'],
-      books: ['admin', 'accounts', 'hr'],
       'account-settings': ['admin', 'accounts', 'data-operations', 'supervisor', 'hr'],
       'pending-approvals': ['admin']
     };

@@ -97,7 +97,6 @@ payroll-uid/
 │   │   ├── (payroll)/      # Payroll exports (PF/ESI/LWF/EPF)
 │   │   ├── (exports)/      # Bulk uploads and data pipelines
 │   │   ├── (units)/        # Unit registration and updation
-│   │   ├── (books)/        # Accounting/books pages + components
 │   │   ├── (invoices)/     # Invoice generation
 │   │   ├── (approvals)/    # Pending approvals
 │   │   ├── (settings)/     # Account settings
@@ -153,10 +152,8 @@ The system implements a comprehensive security model:
 - Compliance exports (EPF, ESIC)
 
 ### Financial Operations
-- Books management and accounting
 - Invoice generation and tracking
 - Bulk upload capabilities
-- Financial year management
 
 ### Reporting & Analytics
 - Salary reports with filtering
