@@ -1,4 +1,4 @@
-# Payroll Management System
+# Payroll Management System.
 
 A comprehensive payroll management solution built with Next.js, designed to streamline HR and payroll operations for businesses. This system provides complete employee management, salary processing, compliance exports, and detailed reporting capabilities. (Just a DEMO)
 
