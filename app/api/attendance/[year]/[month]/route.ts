@@ -19,10 +19,10 @@ interface AttendanceRecord {
 
 export async function POST(
   request: Request,
-  { params }: { params: { year: string; month: string } }
+  { params }: { params: Promise<{ year: string; month: string }> }
 ) {
   try {
-    const { year, month } = params;
+    const { year, month } = await params;
     const { unit, records } = await request.json();
 
     // Log the incoming data
@@ -154,10 +154,10 @@ export async function POST(
 
 export async function GET(
   request: Request,
-  { params }: { params: { year: string; month: string } }
+  { params }: { params: Promise<{ year: string; month: string }> }
 ) {
   try {
-    const { year, month } = params;
+    const { year, month } = await params;
     const { searchParams } = new URL(request.url);
     const unit = searchParams.get('unit');
 

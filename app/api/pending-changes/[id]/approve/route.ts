@@ -9,9 +9,10 @@ import clientPromise from '@/lib/mongodb';
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const cookieStore = await cookies();
     const session = cookieStore.get('sessionUser');
 
@@ -34,7 +35,7 @@ export async function POST(
     const { comments } = body;
 
     // Find the pending change
-    const pendingChange = await PendingChange.findById(params.id);
+    const pendingChange = await PendingChange.findById(id);
 
     if (!pendingChange) {
       return NextResponse.json({

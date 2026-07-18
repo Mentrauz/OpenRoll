@@ -5,11 +5,12 @@ import { employeeSchema } from '@/lib/validation/schemas'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB()
-    const employee = await User.findById(params.id).select('-password')
+    const employee = await User.findById(id).select('-password')
 
     if (!employee) {
       return NextResponse.json(
@@ -35,9 +36,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json()
     const validation = employeeSchema.partial().safeParse(body)
 
@@ -50,7 +52,7 @@ export async function PUT(
 
     await connectDB()
     const employee = await User.findByIdAndUpdate(
-      params.id,
+      id,
       { ...validation.data, updatedAt: new Date() },
       { new: true }
     ).select('-password')
@@ -79,11 +81,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB()
-    const employee = await User.findByIdAndDelete(params.id)
+    const employee = await User.findByIdAndDelete(id)
 
     if (!employee) {
       return NextResponse.json(

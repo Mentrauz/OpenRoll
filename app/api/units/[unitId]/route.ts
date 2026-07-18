@@ -3,14 +3,15 @@ import clientPromise from '@/lib/mongodb';
 
 export async function GET(
   request: Request,
-  { params }: { params: { unitId: string } }
+  { params }: { params: Promise<{ unitId: string }> }
 ) {
   try {
+    const { unitId } = await params;
     const client = await clientPromise;
     const unitsDb = client.db('Units');
     
     const unit = await unitsDb.collection('UnitsList').findOne({
-      _id: params.unitId
+      _id: unitId
     });
 
     if (!unit) {
