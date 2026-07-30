@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [currentStep, setCurrentStep] = useState(1); // 1: ID input, 2: Password input
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const router = useRouter();
 
   const handleContinue = (e: React.FormEvent) => {
@@ -87,6 +88,52 @@ export default function LoginPage() {
       setPassword('');
       setIsLoading(false);
       showErrorToast('Login failed');
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/auth/demo-login', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (data.user) {
+          try { localStorage.setItem('fullName', data.user.fullName || ''); } catch { }
+          try { sessionStorage.setItem('fullName', data.user.fullName || ''); } catch { }
+          try { localStorage.setItem('id', data.user.id || ''); } catch { }
+        }
+        showSuccessToast('Demo login successful', { duration: 2000 });
+        try { sessionStorage.setItem('justLoggedIn', 'true'); } catch { }
+
+        const start = Date.now();
+        let attempts = 0;
+        const maxAttempts = 10;
+        const waitForCookie = () => {
+          attempts++;
+          const hasSession = document.cookie.split('; ').some(c => c.startsWith('sessionUser='));
+          if (hasSession || attempts >= maxAttempts || Date.now() - start > 1000) {
+            router.replace('/dashboard?loginSuccess=true');
+          } else {
+            setTimeout(waitForCookie, 100);
+          }
+        };
+        waitForCookie();
+      } else {
+        setError(data.error || data.message || 'Demo login failed');
+        showErrorToast(data.error || data.message || 'Demo login failed');
+        setIsDemoLoading(false);
+      }
+    } catch {
+      setError('Something went wrong');
+      showErrorToast('Demo login failed');
+      setIsDemoLoading(false);
     }
   };
 
@@ -429,6 +476,42 @@ export default function LoginPage() {
                   </>
                 )}
               </p>
+
+              {/* Demo Auto-Login */}
+              {!isRegisterMode && (
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex-1 h-px bg-zinc-800" />
+                    <span className="text-zinc-600 text-xs">or</span>
+                    <div className="flex-1 h-px bg-zinc-800" />
+                  </div>
+                  <button
+                    id="demo-login-btn"
+                    type="button"
+                    onClick={handleDemoLogin}
+                    disabled={isDemoLoading || isLoading}
+                    className="w-full group relative flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900/60 px-4 py-3 text-sm font-medium text-zinc-300 transition-all hover:border-zinc-500 hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isDemoLoading ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4 text-zinc-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Signing in to demo…</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-4 w-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span>Try Demo Account</span>
+                        <span className="ml-auto text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors">Limited access</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
